@@ -79,6 +79,9 @@ def evaluate_per_page(driver):
             search_button_id=search_button_id,
             first_answer_xpath=first_answer_xpath,
         )
+
+        # Switch back control to the original tab
+        driving_theory.ImageSearch().switch_to_original_tab(driver=driver)
     else:
         # If no image is detected, then use the AnswerSearch class instead
         answer = driving_theory.AnswerSearch().answer_search(question=question)
