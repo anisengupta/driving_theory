@@ -84,7 +84,12 @@ def evaluate_per_page(driver):
         driving_theory.ImageSearch().switch_to_original_tab(driver=driver)
     else:
         # If no image is detected, then use the AnswerSearch class instead
-        answer = driving_theory.AnswerSearch().answer_search(question=question)
+        try:
+            # Try to obtain the correct answer
+            answer = driving_theory.AnswerSearch().answer_search(question=question)
+        except:
+            # If an answer cannot be obtained, choose a random one
+            answer = driving_theory.CorrectAnswer().random_answer(choices_dict=choices_dict)
 
     # Obtain the correct answer amongst the choices
     correct_answer = driving_theory.CorrectAnswer().obtain_correct_answer(

@@ -21,6 +21,7 @@ import urllib
 import pandas as pd
 from requests_html import HTML
 from requests_html import HTMLSession
+import random
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -617,6 +618,22 @@ class CorrectAnswer:
                 correct_answer = choice
 
         return correct_answer
+
+    def random_answer(self, choices_dict: dict) -> str:
+        """
+        In the event that it cannot obtain an answer, it chooses a random one.
+
+        Parameters
+        ----------
+        choices_dict: dict, makes a dictionary of the multiple choices per page.
+
+        Returns
+        -------
+        A string with a random answer selected.
+
+        """
+        choices_list = list(choices_dict.keys())
+        return random.choice(choices_list)
 
 
 class StartTest:
