@@ -26,13 +26,15 @@ def evaluate_per_page(driver):
     # Identify the question
     question_class_name = "govuk-fieldset__heading"
     question = driving_theory.StartTest().identify_question(
-        driver=driver, question_class_name=question_class_name
+        driver=driver, question_class_name=question_class_name,
+        wait_time=10
     )
 
     # Identify the choices
     choice_class_name = "govuk-radios"
     choices = driving_theory.StartTest().identify_choices(
-        driver=driver, choice_class_name=choice_class_name
+        driver=driver, choice_class_name=choice_class_name,
+        wait_time=10
     )
 
     # Make a choices dict
@@ -59,10 +61,16 @@ def evaluate_per_page(driver):
         driver.get("https://www.google.com/imghp?hl=EN")
 
         # Accept the cookies
-        accept_button_xpath = '//*[@id="L2AGLb"]'
-        driving_theory.ImageSearch().accept_google_search_cookies(
-            driver=driver, accept_button_xpath=accept_button_xpath
-        )
+        try:
+            accept_button_xpath = '//*[@id="L2AGLb"]'
+            driving_theory.ImageSearch().accept_google_search_cookies(
+                driver=driver, accept_button_xpath=accept_button_xpath,
+                wait_time=1
+            )
+        except:
+            # Note that if an exception is returned, it means that
+            # cookies are already accepted
+            pass
 
         # Search for the image and obtain an answer
         cam_button_xpath = '//*[@id="sbtc"]/div/div[3]/div[2]/span'
@@ -79,6 +87,9 @@ def evaluate_per_page(driver):
             search_button_id=search_button_id,
             first_answer_xpath=first_answer_xpath,
         )
+
+        # Close the tab opened
+        driving_theory.ImageSearch().close_tab(driver=driver)
 
         # Switch back control to the original tab
         driving_theory.ImageSearch().switch_to_original_tab(driver=driver)

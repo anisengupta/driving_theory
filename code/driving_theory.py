@@ -214,7 +214,7 @@ class ImageSearch:
 
         driver.switch_to_window(window_handles[0])
 
-    def accept_google_search_cookies(self, driver, accept_button_xpath: str):
+    def accept_google_search_cookies(self, driver, accept_button_xpath: str, wait_time: int):
         """
         Accepts the cookies on Google search.
 
@@ -222,6 +222,7 @@ class ImageSearch:
         ----------
         driver: the selenium driver used to open the webpage and start the test.
         accept_button_xpath: str, the xpath of the accept button.
+        wait_time: int, the time (in seconds) to wait
 
         Returns
         -------
@@ -230,10 +231,25 @@ class ImageSearch:
 
         """
 
-        buddy = WebDriverWait(driver, 10).until(
+        buddy = WebDriverWait(driver, wait_time).until(
             EC.visibility_of_element_located((By.XPATH, accept_button_xpath))
         )
         buddy.click()
+
+    def close_tab(self, driver):
+        """
+        Closes the tab of the current driver.
+
+        Parameters
+        ----------
+        driver: the selenium driver used to open the webpage and start the test.
+
+        Returns
+        -------
+        The tab being closed.
+
+        """
+        return driver.close()
 
     def image_search(
         self,
@@ -672,7 +688,7 @@ class StartTest:
 
         return driver
 
-    def identify_question(self, driver, question_class_name: str) -> str:
+    def identify_question(self, driver, question_class_name: str, wait_time: int) -> str:
         """
         Identifies the question on the page the url is accessed and the test is started.
 
@@ -680,6 +696,7 @@ class StartTest:
         ----------
         driver: the selenium used to open the webpage and start the test.
         question_class_name: str, the class name of the question.
+        wait_time: int, the time (in seconds) to wait
 
         Returns
         -------
@@ -687,7 +704,7 @@ class StartTest:
 
         """
         # Wait 10 seconds until the page loads
-        buddy = WebDriverWait(driver, 10).until(
+        buddy = WebDriverWait(driver, wait_time).until(
             EC.visibility_of_element_located((By.CLASS_NAME, question_class_name))
         )
 
@@ -696,7 +713,7 @@ class StartTest:
 
         return question.text
 
-    def identify_choices(self, driver, choice_class_name: str):
+    def identify_choices(self, driver, choice_class_name: str, wait_time: int):
         """
         Identifies the multiple choices per page.
 
@@ -704,6 +721,7 @@ class StartTest:
         ----------
         driver: the selenium driver used to open the webpage and start the test.
         choice_class_name: str, the name of the overall multiple choices per page.
+        wait_time: int, the time (in seconds) to wait
 
         Returns
         -------
@@ -711,7 +729,7 @@ class StartTest:
 
         """
         # Wait 10 seconds until the page loads
-        buddy = WebDriverWait(driver, 10).until(
+        buddy = WebDriverWait(driver, wait_time).until(
             EC.visibility_of_element_located((By.CLASS_NAME, choice_class_name))
         )
 
