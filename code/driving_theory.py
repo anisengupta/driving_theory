@@ -103,6 +103,57 @@ class AnswerSearch:
         return results[0].find(css_identifier_text, first=True).text
 
 
+class ImageDetection:
+    """
+    Class attempts to detect an image in a multiple choice question.
+
+    """
+
+    def __init__(self):
+        pass
+
+    def detect_image(self, driver, image_xpath: str):
+        """
+        Assesses whether an image is present on the given xpath.
+
+        Parameters
+        ----------
+        driver: the selenium driver used to open the webpage and start the test.
+        image_xpath: str, the xpath of the image to look for.
+
+        Returns
+        -------
+        A bool and the body of the image, if present on the page.
+
+        """
+        outcome = False
+        image_body = ""
+        # Determine if the image body is present on the page
+        try:
+            image_body = driver.find_element_by_xpath(image_xpath)
+            outcome = True
+        except Exception as e:
+            print(e)
+
+        return outcome, image_body
+
+    def get_image_url(self, image_body) -> str:
+        """
+        Returns the url of the image if present on the page. Image body is created
+        from the func detect_image.
+
+        Parameters
+        ----------
+        image_body: the selenium webdriver WebElement, generated from the detect_image func.
+
+        Returns
+        -------
+        The url of the image.
+
+        """
+        return image_body.get_attribute("src")
+
+
 class ImageSearch:
     """
     In the event that a pictorial question is asked ('What is this sign?'); class attempts to

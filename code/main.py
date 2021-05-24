@@ -39,7 +39,49 @@ def evaluate_per_page(driver):
     choices_dict = driving_theory.StartTest().make_choices_dict(choices=choices)
 
     # Obtain the answer from Google
-    answer = driving_theory.AnswerSearch().answer_search(question=question)
+    # If the question is pictorial, obtain the answer using the ImageDetection
+    # & ImageSearch classes
+    image_xpath = '//*[@id="main-content"]/div[1]/div/div[3]/div[1]/div[1]/div/div[2]/fieldset/div/div[1]/p/img'
+    image_detection, image_body = driving_theory.ImageDetection().detect_image(
+        driver=driver, image_xpath=image_xpath
+    )
+    if image_detection:
+        # If there is an image detected, obtain its URL
+        image_url = driving_theory.ImageDetection().get_image_url(image_body=image_body)
+
+        # Make a new tab
+        driving_theory.ImageSearch().new_tab(driver=driver)
+
+        # Switch control to the new tab opened
+        driving_theory.ImageSearch().switch_tab(driver=driver)
+
+        # Open Google Image Search in the new tab
+        driver.get("https://www.google.com/imghp?hl=EN")
+
+        # Accept the cookies
+        accept_button_xpath = '//*[@id="L2AGLb"]'
+        driving_theory.ImageSearch().accept_google_search_cookies(
+            driver=driver, accept_button_xpath=accept_button_xpath
+        )
+
+        # Search for the image and obtain an answer
+        cam_button_xpath = '//*[@id="sbtc"]/div/div[3]/div[2]/span'
+        url_tab_xpath = '//*[@id="dRSWfb"]/div/div'
+        image_url_id = "Ycyxxc"
+        search_button_id = "RZJ9Ub"
+        first_answer_xpath = '//*[@id="topstuff"]/div/div[2]/a'
+        answer = driving_theory.ImageSearch().image_search(
+            driver=driver,
+            image_url_path=image_url,
+            cam_button_xpath=cam_button_xpath,
+            url_tab_xpath=url_tab_xpath,
+            image_url_id=image_url_id,
+            search_button_id=search_button_id,
+            first_answer_xpath=first_answer_xpath,
+        )
+    else:
+        # If no image is detected, then use the AnswerSearch class instead
+        answer = driving_theory.AnswerSearch().answer_search(question=question)
 
     # Obtain the correct answer amongst the choices
     correct_answer = driving_theory.CorrectAnswer().obtain_correct_answer(
