@@ -10,7 +10,6 @@ import nltk
 
 nltk.download("wordnet")
 from nltk.corpus import wordnet as wn
-
 from nltk.stem.wordnet import WordNetLemmatizer
 
 import os
@@ -22,6 +21,9 @@ import pandas as pd
 from requests_html import HTML
 from requests_html import HTMLSession
 import random
+from bs4 import BeautifulSoup
+from IPython.display import Image, HTML, clear_output
+from PIL import Image, ImageChops, ImageStat
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -214,7 +216,9 @@ class ImageSearch:
 
         driver.switch_to_window(window_handles[0])
 
-    def accept_google_search_cookies(self, driver, accept_button_xpath: str, wait_time: int):
+    def accept_google_search_cookies(
+        self, driver, accept_button_xpath: str, wait_time: int
+    ):
         """
         Accepts the cookies on Google search.
 
@@ -304,6 +308,173 @@ class ImageSearch:
         answer = driver.find_element_by_xpath(first_answer_xpath)
 
         return answer.text
+
+
+class ImageComparison:
+    """
+    Class compares an image compared to an image bank and determines its caption.
+    Best suited for questions related to identify Highway Code signs.
+
+    """
+
+    def __init__(self):
+        pass
+
+    def make_highway_code_image_bank(self, url: str) -> HTML:
+        """
+        Makes a bank of images from the highway code.
+
+        Parameters
+        ----------
+        url: str, the url to be accessed.
+
+        Returns
+        -------
+        A dataframe with images and their captions
+
+        """
+        # Parse the page and put it into BeautifulSoup
+        html_page = requests.get(url)
+        soup = BeautifulSoup(html_page.content, "html.parser")
+
+        images = soup.find_all("img")
+
+        df_list = []
+        for image in images:
+            # Retrieve the caption and the image url
+            image_url = image.attrs["src"]
+            img_src = f'<img src="{image_url}"/>'
+            caption = image.attrs["alt"]
+
+            # Put the caption and image into a row
+            row_1 = [img_src, caption]
+
+            # Put the row into the dataframe and transpose it
+            df = pd.DataFrame(row_1).transpose()
+
+            # Give the dataframe some columns
+            df.columns = ["Image", "Caption"]
+
+            # Append the df to the df_list
+            df_list.append(df)
+
+        all_images_df = pd.concat(df_list)
+
+        return HTML(all_images_df.to_html(escape=False))
+
+    def make_highway_code_image_dict(self, url: str) -> dict:
+        """
+        Makes a dictionary of image urls and their relevant captions.
+
+        Parameters
+        ----------
+        url: str, the url to be accessed.
+
+        Returns
+        -------
+
+        """
+        # Parse the page and put it into BeautifulSoup
+        html_page = requests.get(url)
+        soup = BeautifulSoup(html_page.content, "html.parser")
+
+        images = soup.find_all("img")
+
+        image_urls = []
+        captions = []
+
+        for image in images:
+            # Retrive the caption and the image url
+            image_url = image.attrs["src"]
+            caption = image.attrs["alt"]
+
+            image_urls.append(image_url)
+            captions.append(caption)
+
+        return dict(zip(image_urls, captions))
+
+    def image_comparison(self, image_one, image_two) -> float:
+        """
+        Compares two different images and returns a score by comparing their
+        values at the pixel level.
+
+        Parameters
+        ----------
+        image_one: the first image
+        image_two: the second image
+
+        Returns
+        -------
+        A float with the score of how similar the images are. The lower the number,
+        the more similar they are, with 0.0 indicating that they are the same image
+
+        """
+        # Make sure that the images are the same sizes
+        image_two = image_two.resize(image_one.size)
+
+        diff = ImageChops.difference(image_one, image_two)
+
+        stat = ImageStat.Stat(diff)
+
+        diff_ratio = sum(stat.mean) / (len(stat.mean) * 255)
+
+        return diff_ratio * 100
+
+    def get_sign_meaning(self, highway_code_image_dict: dict, test_img_url: str) -> str:
+        """
+        Gets the caption of a sign based on the available image bank; highlighted in the
+        highway_code_image_dict param.
+
+        Parameters
+        ----------
+        highway_code_image_dict: dict, the image bank to be used.
+        test_img_url: str, the url of the image to be tested.
+
+        Returns
+        -------
+        A caption of the test image.
+
+        """
+        # Make a list of image urls from the database
+        controls = list(highway_code_image_dict.keys())
+
+        # Load the test image
+        test = Image.open(requests.get(test_img_url, stream=True).raw).convert("RGB")
+
+        scores = []
+
+        # For each control image from the image bank
+        for control in controls:
+            print(f"Testing test image against {highway_code_image_dict.get(control)}")
+            clear_output(wait=True)
+
+            # Load the control image
+            control_img = Image.open(requests.get(control, stream=True).raw).convert(
+                "RGB"
+            )
+
+            # Compute a score
+            img_score = ImageComparison().image_comparison(
+                image_one=test, image_two=control_img
+            )
+
+            # Append the score to the overall scores list
+            scores.append(img_score)
+
+        # Make a dictionary of the scores and the image urls
+        scores_dict = dict(zip(scores, controls))
+
+        # Compute the minimum score
+        min_score = min(scores)
+
+        # If the min score is less than 6, return the caption
+        if min_score < 6:
+            return highway_code_image_dict.get(scores_dict.get(min_score))
+
+        # Else, the image caption cannot be found
+        else:
+            no_caption_outcome = 'No caption found'
+            return no_caption_outcome
 
 
 class CorrectAnswer:
@@ -688,7 +859,9 @@ class StartTest:
 
         return driver
 
-    def identify_question(self, driver, question_class_name: str, wait_time: int) -> str:
+    def identify_question(
+        self, driver, question_class_name: str, wait_time: int
+    ) -> str:
         """
         Identifies the question on the page the url is accessed and the test is started.
 

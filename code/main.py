@@ -35,7 +35,15 @@ def evaluate_per_page(driver):
     choices = driving_theory.StartTest().identify_choices(
         driver=driver, choice_class_name=choice_class_name,
         wait_time=10
+    )# Identify the choices
+    choice_class_name = "govuk-radios"
+    choices = driving_theory.StartTest().identify_choices(
+        driver=driver, choice_class_name=choice_class_name,
+        wait_time=10
     )
+
+    # Make a choices dict
+    choices_dict = driving_theory.StartTest().make_choices_dict(choices=choices)
 
     # Make a choices dict
     choices_dict = driving_theory.StartTest().make_choices_dict(choices=choices)
@@ -51,48 +59,66 @@ def evaluate_per_page(driver):
         # If there is an image detected, obtain its URL
         image_url = driving_theory.ImageDetection().get_image_url(image_body=image_body)
 
-        # Make a new tab
-        driving_theory.ImageSearch().new_tab(driver=driver)
-
-        # Switch control to the new tab opened
-        driving_theory.ImageSearch().switch_tab(driver=driver)
-
-        # Open Google Image Search in the new tab
-        driver.get("https://www.google.com/imghp?hl=EN")
-
-        # Accept the cookies
-        try:
-            accept_button_xpath = '//*[@id="L2AGLb"]'
-            driving_theory.ImageSearch().accept_google_search_cookies(
-                driver=driver, accept_button_xpath=accept_button_xpath,
-                wait_time=1
-            )
-        except:
-            # Note that if an exception is returned, it means that
-            # cookies are already accepted
-            pass
-
-        # Search for the image and obtain an answer
-        cam_button_xpath = '//*[@id="sbtc"]/div/div[3]/div[2]/span'
-        url_tab_xpath = '//*[@id="dRSWfb"]/div/div'
-        image_url_id = "Ycyxxc"
-        search_button_id = "RZJ9Ub"
-        first_answer_xpath = '//*[@id="topstuff"]/div/div[2]/a'
-        answer = driving_theory.ImageSearch().image_search(
-            driver=driver,
-            image_url_path=image_url,
-            cam_button_xpath=cam_button_xpath,
-            url_tab_xpath=url_tab_xpath,
-            image_url_id=image_url_id,
-            search_button_id=search_button_id,
-            first_answer_xpath=first_answer_xpath,
+        # Lets see if we can use the ImageComparison class to obtain a caption
+        highway_code_url = 'https://www.gov.uk/guidance/the-highway-code/traffic-signs'
+        highway_code_image_dict = driving_theory.ImageComparison().make_highway_code_image_dict(
+            url=highway_code_url
         )
 
-        # Close the tab opened
-        driving_theory.ImageSearch().close_tab(driver=driver)
+        # Obtain an initial answer
+        answer = driving_theory.ImageComparison().get_sign_meaning(
+            highway_code_image_dict=highway_code_image_dict,
+            test_img_url=image_url
+        )
 
-        # Switch back control to the original tab
-        driving_theory.ImageSearch().switch_to_original_tab(driver=driver)
+        # If the initial method doesnt find an answer, use the ImageSearch class
+        if answer == 'No caption found':
+            # Make a new tab
+            driving_theory.ImageSearch().new_tab(driver=driver)
+
+            # Switch control to the new tab opened
+            driving_theory.ImageSearch().switch_tab(driver=driver)
+
+            # Open Google Image Search in the new tab
+            driver.get("https://www.google.com/imghp?hl=EN")
+
+            # Accept the cookies
+            try:
+                accept_button_xpath = '//*[@id="L2AGLb"]'
+                driving_theory.ImageSearch().accept_google_search_cookies(
+                    driver=driver, accept_button_xpath=accept_button_xpath,
+                    wait_time=1
+                )
+            except:
+                # Note that if an exception is returned, it means that
+                # cookies are already accepted
+                pass
+
+            # Search for the image and obtain an answer
+            cam_button_xpath = '//*[@id="sbtc"]/div/div[3]/div[2]/span'
+            url_tab_xpath = '//*[@id="dRSWfb"]/div/div'
+            image_url_id = "Ycyxxc"
+            search_button_id = "RZJ9Ub"
+            first_answer_xpath = '//*[@id="topstuff"]/div/div[2]/a'
+            answer = driving_theory.ImageSearch().image_search(
+                driver=driver,
+                image_url_path=image_url,
+                cam_button_xpath=cam_button_xpath,
+                url_tab_xpath=url_tab_xpath,
+                image_url_id=image_url_id,
+                search_button_id=search_button_id,
+                first_answer_xpath=first_answer_xpath,
+            )
+
+            # Close the tab opened
+            driving_theory.ImageSearch().close_tab(driver=driver)
+
+            # Switch back control to the original tab
+            driving_theory.ImageSearch().switch_to_original_tab(driver=driver)
+        else:
+            # If the initial method using the ImageComparison class worked,
+            # just use that as the answer
+            answer = answer
     else:
         # If no image is detected, then use the AnswerSearch class instead
         try:
@@ -136,6 +162,7 @@ def evaluate_all_pages(driver):
         driver=driver, next_page_button_id=next_page_button_id
     )
 
+    # Recursively complete all pages
     evaluate_all_pages(driver)
 
 
