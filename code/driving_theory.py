@@ -18,12 +18,15 @@ import unicodedata
 import requests
 import urllib
 import pandas as pd
+import numpy as np
+import cv2
 from requests_html import HTML
 from requests_html import HTMLSession
 import random
 from bs4 import BeautifulSoup
 from IPython.display import Image, HTML, clear_output
 from PIL import Image, ImageChops, ImageStat
+from skimage import io
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -478,6 +481,62 @@ class ImageComparison:
         else:
             no_caption_outcome = "No caption found"
             return no_caption_outcome
+
+    def detect_shape(self, image_url: str) -> str:
+        """
+        Detects the shape of an image. Note that this is a simple method
+        and can only detect shapes of images that are regular: circle, rectangle, pentagon,
+        square etc.
+
+        Parameters
+        ----------
+        image_url: str, the url of the image to be tested.
+
+        Returns
+        -------
+        A string with the shape of the image.
+
+        """
+        # Open image with pillow
+        image = Image.open(
+            requests.get(image_url, stream=True).raw
+        ).convert('RGB')
+
+        # Convert the image into an array
+        image_array = io.imread(image_url)
+
+        # Convert the image array into grayscale
+        gray = cv2.cvtColor(
+            np.float32(image), cv2.COLOR_RGB2GRAY).astype('uint8')
+
+        # Compute the threshold
+        ret, thresh = cv2.threshold(gray, 127, 255, 1)
+
+        # Find the contours
+        contours, h = cv2.findContours(thresh, 1, 2)
+
+        # For each contour
+        shape = []
+        for contour in contours:
+            # Approximate the shape
+            approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
+            if len(approx) == 5:
+                shape.append("pentagon")
+                cv2.drawContours(image_array, [contour], 0, 255, -1)
+            elif len(approx) == 3:
+                shape.append("triangle")
+                cv2.drawContours(image_array, [contour], 0, (0, 255, 0), -1)
+            elif len(approx) == 4:
+                shape.append("square")
+                cv2.drawContours(image_array, [contour], 0, (0, 0, 255), -1)
+            elif len(approx) == 9:
+                shape.append("half-circle")
+                cv2.drawContours(image_array, [contour], 0, (255, 255, 0), -1)
+            elif len(approx) > 15:
+                shape.append("circle")
+                cv2.drawContours(image_array, [contour], 0, (0, 255, 255), -1)
+
+        return shape[0]
 
 
 class CorrectAnswer:
