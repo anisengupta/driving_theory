@@ -26,20 +26,17 @@ def evaluate_per_page(driver):
     # Identify the question
     question_class_name = "govuk-fieldset__heading"
     question = driving_theory.StartTest().identify_question(
-        driver=driver, question_class_name=question_class_name,
-        wait_time=10
+        driver=driver, question_class_name=question_class_name, wait_time=10
     )
 
     # Identify the choices
     choice_class_name = "govuk-radios"
     choices = driving_theory.StartTest().identify_choices(
-        driver=driver, choice_class_name=choice_class_name,
-        wait_time=10
-    )# Identify the choices
+        driver=driver, choice_class_name=choice_class_name, wait_time=10
+    )  # Identify the choices
     choice_class_name = "govuk-radios"
     choices = driving_theory.StartTest().identify_choices(
-        driver=driver, choice_class_name=choice_class_name,
-        wait_time=10
+        driver=driver, choice_class_name=choice_class_name, wait_time=10
     )
 
     # Make a choices dict
@@ -60,19 +57,23 @@ def evaluate_per_page(driver):
         image_url = driving_theory.ImageDetection().get_image_url(image_body=image_body)
 
         # Lets see if we can use the ImageComparison class to obtain a caption
-        highway_code_url = 'https://www.gov.uk/guidance/the-highway-code/traffic-signs'
-        highway_code_image_dict = driving_theory.ImageComparison().make_highway_code_image_dict(
-            url=highway_code_url
+        highway_code_url = "https://www.gov.uk/guidance/the-highway-code/traffic-signs"
+        highway_code_image_dict = (
+            driving_theory.ImageComparison().make_highway_code_image_dict(
+                url=highway_code_url
+            )
         )
 
         # Obtain an initial answer
+        threshold = 10
         answer = driving_theory.ImageComparison().get_sign_meaning(
             highway_code_image_dict=highway_code_image_dict,
-            test_img_url=image_url
+            test_img_url=image_url,
+            threshold=threshold,
         )
 
         # If the initial method doesnt find an answer, use the ImageSearch class
-        if answer == 'No caption found':
+        if answer == "No caption found":
             # Make a new tab
             driving_theory.ImageSearch().new_tab(driver=driver)
 
@@ -86,8 +87,7 @@ def evaluate_per_page(driver):
             try:
                 accept_button_xpath = '//*[@id="L2AGLb"]'
                 driving_theory.ImageSearch().accept_google_search_cookies(
-                    driver=driver, accept_button_xpath=accept_button_xpath,
-                    wait_time=1
+                    driver=driver, accept_button_xpath=accept_button_xpath, wait_time=1
                 )
             except:
                 # Note that if an exception is returned, it means that
@@ -126,7 +126,9 @@ def evaluate_per_page(driver):
             answer = driving_theory.AnswerSearch().answer_search(question=question)
         except:
             # If an answer cannot be obtained, choose a random one
-            answer = driving_theory.CorrectAnswer().random_answer(choices_dict=choices_dict)
+            answer = driving_theory.CorrectAnswer().random_answer(
+                choices_dict=choices_dict
+            )
 
     # Obtain the correct answer amongst the choices
     correct_answer = driving_theory.CorrectAnswer().obtain_correct_answer(

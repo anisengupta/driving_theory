@@ -420,7 +420,9 @@ class ImageComparison:
 
         return diff_ratio * 100
 
-    def get_sign_meaning(self, highway_code_image_dict: dict, test_img_url: str) -> str:
+    def get_sign_meaning(
+        self, highway_code_image_dict: dict, test_img_url: str, threshold: int
+    ) -> str:
         """
         Gets the caption of a sign based on the available image bank; highlighted in the
         highway_code_image_dict param.
@@ -429,6 +431,7 @@ class ImageComparison:
         ----------
         highway_code_image_dict: dict, the image bank to be used.
         test_img_url: str, the url of the image to be tested.
+        threshold: int, the threshold to consider for the min_score computed.
 
         Returns
         -------
@@ -468,12 +471,12 @@ class ImageComparison:
         min_score = min(scores)
 
         # If the min score is less than 6, return the caption
-        if min_score < 6:
+        if min_score < threshold:
             return highway_code_image_dict.get(scores_dict.get(min_score))
 
         # Else, the image caption cannot be found
         else:
-            no_caption_outcome = 'No caption found'
+            no_caption_outcome = "No caption found"
             return no_caption_outcome
 
 
