@@ -118,7 +118,7 @@ class ImageDetection:
     def __init__(self):
         pass
 
-    def detect_image(self, driver, image_xpath: str):
+    def detect_image_question(self, driver, image_xpath: str):
         """
         Assesses whether an image is present on the given xpath.
 
@@ -158,6 +158,31 @@ class ImageDetection:
 
         """
         return image_body.get_attribute("src")
+
+    def detect_image_answers(self, driver, image_answers_class_name: str):
+        """
+        Detects whether the answers themselves are images.
+
+        Parameters
+        ----------
+        driver: the selenium driver used to open the webpage and start the test.
+        image_answers_class_name: str, the class name of the image answers.
+
+        Returns
+        -------
+        A list of image urls of the answers.
+
+        """
+        # Returns a list of images
+        image_body = driver.find_elements_by_class_name(image_answers_class_name)
+
+        # Image urls
+        image_urls = []
+        for body in image_body:
+            image_url = ImageDetection().get_image_url(image_body=body)
+            image_urls.append(image_url)
+
+        return image_urls
 
 
 class ImageSearch:
@@ -387,7 +412,7 @@ class ImageComparison:
         captions = []
 
         for image in images:
-            # Retrive the caption and the image url
+            # Retrieve the caption and the image url
             image_url = image.attrs["src"]
             caption = image.attrs["alt"]
 
@@ -452,7 +477,6 @@ class ImageComparison:
         # For each control image from the image bank
         for control in controls:
             print(f"Testing test image against {highway_code_image_dict.get(control)}")
-            clear_output(wait=True)
 
             # Load the control image
             control_img = Image.open(requests.get(control, stream=True).raw).convert(
@@ -473,7 +497,7 @@ class ImageComparison:
         # Compute the minimum score
         min_score = min(scores)
 
-        # If the min score is less than 6, return the caption
+        # If the min score is less than the threshold, return the caption
         if min_score < threshold:
             return highway_code_image_dict.get(scores_dict.get(min_score))
 
@@ -498,16 +522,13 @@ class ImageComparison:
 
         """
         # Open image with pillow
-        image = Image.open(
-            requests.get(image_url, stream=True).raw
-        ).convert('RGB')
+        image = Image.open(requests.get(image_url, stream=True).raw).convert("RGB")
 
         # Convert the image into an array
         image_array = io.imread(image_url)
 
         # Convert the image array into grayscale
-        gray = cv2.cvtColor(
-            np.float32(image), cv2.COLOR_RGB2GRAY).astype('uint8')
+        gray = cv2.cvtColor(np.float32(image), cv2.COLOR_RGB2GRAY).astype("uint8")
 
         # Compute the threshold
         ret, thresh = cv2.threshold(gray, 127, 255, 1)
@@ -519,7 +540,9 @@ class ImageComparison:
         shape = []
         for contour in contours:
             # Approximate the shape
-            approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
+            approx = cv2.approxPolyDP(
+                contour, 0.01 * cv2.arcLength(contour, True), True
+            )
             if len(approx) == 5:
                 shape.append("pentagon")
                 cv2.drawContours(image_array, [contour], 0, 255, -1)
@@ -537,6 +560,78 @@ class ImageComparison:
                 cv2.drawContours(image_array, [contour], 0, (0, 255, 255), -1)
 
         return shape[0]
+
+
+class ImageAnswers:
+    def __init__(self):
+        pass
+
+    def image_answer(
+        self, image_urls: list, highway_code_image_dict: dict, question: str
+    ):
+        """
+        Obtains the answer from the image answers. Uses the ImageComparison
+        class to obtain a caption for the images in the image_urls param.
+
+        Parameters
+        ----------
+        image_urls: list, a list of the image_urls on the page.
+        highway_code_image_dict: dict, the image bank to be used.
+        question: str, the question being asked.
+
+        Returns
+        -------
+        A string with the answer to the question
+
+        """
+        captions = []
+
+        # For each image url, obtain a caption
+        for image_url in image_urls:
+            threshold = 10
+            caption = ImageComparison().get_sign_meaning(
+                highway_code_image_dict=highway_code_image_dict,
+                test_img_url=image_url,
+                threshold=threshold,
+            )
+
+            captions.append(caption)
+
+        # Make a dictionary of captions and their corresponding urls
+        captions_dict = dict(zip(captions, image_urls))
+
+        # Make topics from the question
+        question_topics = CorrectAnswer().prepare_text_for_lda(text=question)
+
+        # Obtain the answer
+        try:
+            answer = [s for s in captions if any(xs in s for xs in question_topics)][0]
+            answer_outcome = "Answer obtained"
+            return answer, captions_dict, answer_outcome
+        except:
+            # In the event that an answer cannot be obtained
+            answer = ""
+            answer_outcome = "No answer obtained"
+            return answer, captions_dict, answer_outcome
+
+    def update_choices_dict(self, captions: list) -> dict:
+        """
+        Updates the choices_dict to contain the captions obtained from the func
+        image_answer.
+
+        Parameters
+        ----------
+        captions: list, a list of captions for the images obtained.
+
+        Returns
+        -------
+        A dict with the captions and the their corresponding question keys.
+
+        """
+        # Make a keys list
+        keys = ["questions-0", "questions-1", "questions-2", "questions-3"]
+
+        return dict(zip(captions, keys))
 
 
 class CorrectAnswer:
@@ -993,6 +1088,33 @@ class StartTest:
         keys = ["questions-0", "questions-1", "questions-2", "questions-3"]
 
         return dict(zip(choices_list, keys))
+
+    def evaluate_choices_dict(self, choices_dict: dict) -> bool:
+        """
+        Evaluates to see if the choices_dict created is empty. If True
+        returned then this means that the choices in the page do not
+        contain text; they contain images.
+
+        Parameters
+        ----------
+        choices_dict: dict, a dictionary of choices made from the
+        make_choices_dict func.
+
+        Returns
+        -------
+        A bool, indicating whether or not the choices dict is empty or not.
+
+        """
+        # Make a list of keys
+        choices_dict_keys = list(choices_dict.keys())
+
+        # Return the outcome
+        if "" in choices_dict_keys:
+            outcome = True
+        else:
+            outcome = False
+
+        return outcome
 
     def click_answer(self, driver, correct_answer: str, choices_dict: dict):
         """
