@@ -1047,6 +1047,24 @@ class StartTest:
 
         return question.text
 
+    def identify_shape_question(self, question: str) -> bool:
+        """
+        Identifies whether the word 'shape' is present within the question.
+
+        Parameters
+        ----------
+        question: str, the initial question input.
+
+        Returns
+        -------
+        A bool to indicate whether the question is asking about shapes.
+
+        """
+        if 'shape' in question:
+            return True
+        else:
+            return False
+
     def identify_choices(self, driver, choice_class_name: str, wait_time: int):
         """
         Identifies the multiple choices per page.

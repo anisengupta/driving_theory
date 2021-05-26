@@ -135,44 +135,63 @@ def evaluate_per_page(driver, highway_code_image_dict: dict):
 
         if choices_dict_eval:
             print("Looks like there are empty strings in the choices_dict")
-            print("This means that the answers do not contain text, the contain images")
+            print("This means that the answers do not contain text, they contain images")
             # If the choices_dict_eval is True - it contains empty strings
             image_answers_class_name = "choice-image"
             print("Obtaining the image urls of the answers")
             image_urls = driving_theory.ImageDetection().detect_image_answers(
                 driver=driver, image_answers_class_name=image_answers_class_name
             )
-            print(
-                "Attempting to obtain an answer, a captions_dict and the answers_outcome"
-            )
-            (
-                answer,
-                captions_dict,
-                answer_outcome,
-            ) = driving_theory.ImageAnswers().image_answer(
-                image_urls=image_urls,
-                highway_code_image_dict=highway_code_image_dict,
-                question=question,
-            )
-            print(answer_outcome)
-            print(answer)
 
-            # Update the choices_dict accordingly
-            if answer_outcome == "Answer obtained":
-                print("Looks like an answer was obtained")
-                # If an answer is obtained then update the choices_dict
-                print("Obtaining a list of captions")
-                captions = list(captions_dict.keys())
-                print(captions)
+            # Identify whether the question being asked is a shape one
+            print('Identifying whether the question being asked is a shape one')
+            shape_question = driving_theory.StartTest().identify_shape_question(
+                question=question
+            )
 
-                print("Updating the choices_dict")
-                choices_dict = driving_theory.ImageAnswers().update_choices_dict(
-                    captions=captions
-                )
+            if shape_question:
+                print('Looks like a shape question is detected')
+                shapes = []
+
+                print('Obtaining the shapes for the images')
+                for image_url in image_urls:
+                    shape = driving_theory.ImageComparison().detect_shape(image_url=image_url)
+                    shapes.append(shape)
+
+                print('Updating the choices_dict with the images shapes')
+                choices_dict = driving_theory.ImageAnswers().update_choices_dict(captions=shapes)
             else:
-                print("An answer was not obtained, keeping the choices_dict the same")
-                # If no answer is obtained then do not change the choices_dict
-                choices_dict = choices_dict
+                print(
+                    "Attempting to obtain an answer, a captions_dict and the answers_outcome"
+                )
+                (
+                    answer,
+                    captions_dict,
+                    answer_outcome,
+                ) = driving_theory.ImageAnswers().image_answer(
+                    image_urls=image_urls,
+                    highway_code_image_dict=highway_code_image_dict,
+                    question=question,
+                )
+                print(answer_outcome)
+                print(answer)
+
+                # Update the choices_dict accordingly
+                if answer_outcome == "Answer obtained":
+                    print("Looks like an answer was obtained")
+                    # If an answer is obtained then update the choices_dict
+                    print("Obtaining a list of captions")
+                    captions = list(captions_dict.keys())
+                    print(captions)
+
+                    print("Updating the choices_dict")
+                    choices_dict = driving_theory.ImageAnswers().update_choices_dict(
+                        captions=captions
+                    )
+                else:
+                    print("An answer was not obtained, keeping the choices_dict the same")
+                    # If no answer is obtained then do not change the choices_dict
+                    choices_dict = choices_dict
 
         # If no image is detected, then use the AnswerSearch class instead
         print("Looks like there are no images detected")
