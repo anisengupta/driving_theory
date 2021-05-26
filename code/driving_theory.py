@@ -476,7 +476,11 @@ class ImageComparison:
 
         # For each control image from the image bank
         for control in controls:
-            print(f"Testing test image against {highway_code_image_dict.get(control)}")
+            print(
+                "\r, "
+                f"Testing test image against {highway_code_image_dict.get(control)}",
+                end="",
+            )
 
             # Load the control image
             control_img = Image.open(requests.get(control, stream=True).raw).convert(
