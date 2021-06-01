@@ -27,6 +27,9 @@ from bs4 import BeautifulSoup
 from IPython.display import Image, HTML, clear_output
 from PIL import Image, ImageChops, ImageStat
 from skimage import io
+from re import search
+from datetime import date
+import logging
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -961,9 +964,25 @@ class CorrectAnswer:
         # Obtain the correct answer from the highest score given
         correct_answer = ""
 
+        # Evaluate if the score_dict contains duplicate scores
+        duplicate_answers = []
         for choice, score in score_dict.items():
             if score == max(list(score_dict.values())):
-                correct_answer = choice
+                duplicate_answers.append(choice)
+
+        if len(duplicate_answers) > 1:
+            print('Duplicate answers detected, using regex to find the answer')
+            # If there are multiple duplicate_answers
+            for duplicate_answer in duplicate_answers:
+                # use regex.search to search for the correct one
+                if search(duplicate_answer, answer):
+                    correct_answer = duplicate_answer
+        else:
+            # If there are no duplicate answers, choose the answer with the
+            # highest score
+            for choice, score in score_dict.items():
+                if score == max(list(score_dict.values())):
+                    correct_answer = choice
 
         return correct_answer
 
@@ -1193,3 +1212,50 @@ class StartTest:
 
         """
         driver.find_element_by_class_name(end_button_id).click()
+
+
+class Logging:
+    """
+    Logs all messages and outputs from the bot.
+
+    """
+    def __init__(self):
+        pass
+
+    def create_filename(self, filepath: str) -> str:
+        """
+        Creates a filename with the latest date.
+
+        Parameters
+        ----------
+        filepath: str, the filepath of the logger file.
+
+        Returns
+        -------
+        A filename with the latest date.
+
+        """
+        today = date.today()
+        d1 = today.strftime("%d_%m_%Y")
+
+        return filepath + '/driving_theory_log_' + d1 + '.txt'
+
+    def create_logging_config(self, filepath: str):
+        """
+        Creates a configuration to be used for logging purposes.
+
+        Parameters
+        ----------
+        filepath: str, the filepath of the logger file.
+
+        Returns
+        -------
+
+        """
+        filename = Logging().create_filename(filepath=filepath)
+
+        return logging.basicConfig(filename=filename,
+                                   filemode='a',
+                                   format='%(asctime)s - %(message)s',
+                                   datefmt='%d-%b-%y %H:%M:%S',
+                                   level=logging.DEBUG)
