@@ -10,7 +10,6 @@ import nltk
 
 nltk.download("wordnet")
 from nltk.corpus import wordnet as wn
-
 from nltk.stem.wordnet import WordNetLemmatizer
 
 import os
@@ -19,8 +18,18 @@ import unicodedata
 import requests
 import urllib
 import pandas as pd
+import numpy as np
+import cv2
 from requests_html import HTML
 from requests_html import HTMLSession
+import random
+from bs4 import BeautifulSoup
+from IPython.display import Image, HTML, clear_output
+from PIL import Image, ImageChops, ImageStat
+from skimage import io
+import re
+from datetime import date
+import logging
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -103,6 +112,82 @@ class AnswerSearch:
         return results[0].find(css_identifier_text, first=True).text
 
 
+class ImageDetection:
+    """
+    Class attempts to detect an image in a multiple choice question.
+
+    """
+
+    def __init__(self):
+        pass
+
+    def detect_image_question(self, driver, image_xpath: str):
+        """
+        Assesses whether an image is present on the given xpath.
+
+        Parameters
+        ----------
+        driver: the selenium driver used to open the webpage and start the test.
+        image_xpath: str, the xpath of the image to look for.
+
+        Returns
+        -------
+        A bool and the body of the image, if present on the page.
+
+        """
+        outcome = False
+        image_body = ""
+        # Determine if the image body is present on the page
+        try:
+            image_body = driver.find_element_by_xpath(image_xpath)
+            outcome = True
+        except Exception as e:
+            print(e)
+
+        return outcome, image_body
+
+    def get_image_url(self, image_body) -> str:
+        """
+        Returns the url of the image if present on the page. Image body is created
+        from the func detect_image.
+
+        Parameters
+        ----------
+        image_body: the selenium webdriver WebElement, generated from the detect_image func.
+
+        Returns
+        -------
+        The url of the image.
+
+        """
+        return image_body.get_attribute("src")
+
+    def detect_image_answers(self, driver, image_answers_class_name: str):
+        """
+        Detects whether the answers themselves are images.
+
+        Parameters
+        ----------
+        driver: the selenium driver used to open the webpage and start the test.
+        image_answers_class_name: str, the class name of the image answers.
+
+        Returns
+        -------
+        A list of image urls of the answers.
+
+        """
+        # Returns a list of images
+        image_body = driver.find_elements_by_class_name(image_answers_class_name)
+
+        # Image urls
+        image_urls = []
+        for body in image_body:
+            image_url = ImageDetection().get_image_url(image_body=body)
+            image_urls.append(image_url)
+
+        return image_urls
+
+
 class ImageSearch:
     """
     In the event that a pictorial question is asked ('What is this sign?'); class attempts to
@@ -162,7 +247,9 @@ class ImageSearch:
 
         driver.switch_to_window(window_handles[0])
 
-    def accept_google_search_cookies(self, driver, accept_button_xpath: str):
+    def accept_google_search_cookies(
+        self, driver, accept_button_xpath: str, wait_time: int
+    ):
         """
         Accepts the cookies on Google search.
 
@@ -170,6 +257,7 @@ class ImageSearch:
         ----------
         driver: the selenium driver used to open the webpage and start the test.
         accept_button_xpath: str, the xpath of the accept button.
+        wait_time: int, the time (in seconds) to wait
 
         Returns
         -------
@@ -178,10 +266,25 @@ class ImageSearch:
 
         """
 
-        buddy = WebDriverWait(driver, 10).until(
+        buddy = WebDriverWait(driver, wait_time).until(
             EC.visibility_of_element_located((By.XPATH, accept_button_xpath))
         )
         buddy.click()
+
+    def close_tab(self, driver):
+        """
+        Closes the tab of the current driver.
+
+        Parameters
+        ----------
+        driver: the selenium driver used to open the webpage and start the test.
+
+        Returns
+        -------
+        The tab being closed.
+
+        """
+        return driver.close()
 
     def image_search(
         self,
@@ -236,6 +339,306 @@ class ImageSearch:
         answer = driver.find_element_by_xpath(first_answer_xpath)
 
         return answer.text
+
+
+class ImageComparison:
+    """
+    Class compares an image compared to an image bank and determines its caption.
+    Best suited for questions related to identify Highway Code signs.
+
+    """
+
+    def __init__(self):
+        pass
+
+    def make_highway_code_image_bank(self, url: str) -> HTML:
+        """
+        Makes a bank of images from the highway code.
+
+        Parameters
+        ----------
+        url: str, the url to be accessed.
+
+        Returns
+        -------
+        A dataframe with images and their captions
+
+        """
+        # Parse the page and put it into BeautifulSoup
+        html_page = requests.get(url)
+        soup = BeautifulSoup(html_page.content, "html.parser")
+
+        images = soup.find_all("img")
+
+        df_list = []
+        for image in images:
+            # Retrieve the caption and the image url
+            image_url = image.attrs["src"]
+            img_src = f'<img src="{image_url}"/>'
+            caption = image.attrs["alt"]
+
+            # Put the caption and image into a row
+            row_1 = [img_src, caption]
+
+            # Put the row into the dataframe and transpose it
+            df = pd.DataFrame(row_1).transpose()
+
+            # Give the dataframe some columns
+            df.columns = ["Image", "Caption"]
+
+            # Append the df to the df_list
+            df_list.append(df)
+
+        all_images_df = pd.concat(df_list)
+
+        return HTML(all_images_df.to_html(escape=False))
+
+    def make_highway_code_image_dict(self, url: str) -> dict:
+        """
+        Makes a dictionary of image urls and their relevant captions.
+
+        Parameters
+        ----------
+        url: str, the url to be accessed.
+
+        Returns
+        -------
+
+        """
+        # Parse the page and put it into BeautifulSoup
+        html_page = requests.get(url)
+        soup = BeautifulSoup(html_page.content, "html.parser")
+
+        images = soup.find_all("img")
+
+        image_urls = []
+        captions = []
+
+        for image in images:
+            # Retrieve the caption and the image url
+            image_url = image.attrs["src"]
+            caption = image.attrs["alt"]
+
+            image_urls.append(image_url)
+            captions.append(caption)
+
+        return dict(zip(image_urls, captions))
+
+    def image_comparison(self, image_one, image_two) -> float:
+        """
+        Compares two different images and returns a score by comparing their
+        values at the pixel level.
+
+        Parameters
+        ----------
+        image_one: the first image
+        image_two: the second image
+
+        Returns
+        -------
+        A float with the score of how similar the images are. The lower the number,
+        the more similar they are, with 0.0 indicating that they are the same image
+
+        """
+        # Make sure that the images are the same sizes
+        image_two = image_two.resize(image_one.size)
+
+        diff = ImageChops.difference(image_one, image_two)
+
+        stat = ImageStat.Stat(diff)
+
+        diff_ratio = sum(stat.mean) / (len(stat.mean) * 255)
+
+        return diff_ratio * 100
+
+    def get_sign_meaning(
+        self, highway_code_image_dict: dict, test_img_url: str, threshold: int
+    ) -> str:
+        """
+        Gets the caption of a sign based on the available image bank; highlighted in the
+        highway_code_image_dict param.
+
+        Parameters
+        ----------
+        highway_code_image_dict: dict, the image bank to be used.
+        test_img_url: str, the url of the image to be tested.
+        threshold: int, the threshold to consider for the min_score computed.
+
+        Returns
+        -------
+        A caption of the test image.
+
+        """
+        # Make a list of image urls from the database
+        controls = list(highway_code_image_dict.keys())
+
+        # Load the test image
+        test = Image.open(requests.get(test_img_url, stream=True).raw).convert("RGB")
+
+        scores = []
+
+        # For each control image from the image bank
+        for control in controls:
+            print(
+                "\r, "
+                f"Testing test image against {highway_code_image_dict.get(control)}",
+                end="",
+            )
+
+            # Load the control image
+            control_img = Image.open(requests.get(control, stream=True).raw).convert(
+                "RGB"
+            )
+
+            # Compute a score
+            img_score = ImageComparison().image_comparison(
+                image_one=test, image_two=control_img
+            )
+
+            # Append the score to the overall scores list
+            scores.append(img_score)
+
+        # Make a dictionary of the scores and the image urls
+        scores_dict = dict(zip(scores, controls))
+
+        # Compute the minimum score
+        min_score = min(scores)
+
+        # If the min score is less than the threshold, return the caption
+        if min_score < threshold:
+            return highway_code_image_dict.get(scores_dict.get(min_score))
+
+        # Else, the image caption cannot be found
+        else:
+            no_caption_outcome = "No caption found"
+            return no_caption_outcome
+
+    def detect_shape(self, image_url: str) -> str:
+        """
+        Detects the shape of an image. Note that this is a simple method
+        and can only detect shapes of images that are regular: circle, rectangle, pentagon,
+        square etc.
+
+        Parameters
+        ----------
+        image_url: str, the url of the image to be tested.
+
+        Returns
+        -------
+        A string with the shape of the image.
+
+        """
+        # Open image with pillow
+        image = Image.open(requests.get(image_url, stream=True).raw).convert("RGB")
+
+        # Convert the image into an array
+        image_array = io.imread(image_url)
+
+        # Convert the image array into grayscale
+        gray = cv2.cvtColor(np.float32(image), cv2.COLOR_RGB2GRAY).astype("uint8")
+
+        # Compute the threshold
+        ret, thresh = cv2.threshold(gray, 127, 255, 1)
+
+        # Find the contours
+        contours, h = cv2.findContours(thresh, 1, 2)
+
+        # For each contour
+        shape = []
+        for contour in contours:
+            # Approximate the shape
+            approx = cv2.approxPolyDP(
+                contour, 0.01 * cv2.arcLength(contour, True), True
+            )
+            if len(approx) == 5:
+                shape.append("pentagon")
+                cv2.drawContours(image_array, [contour], 0, 255, -1)
+            elif len(approx) == 3:
+                shape.append("triangle")
+                cv2.drawContours(image_array, [contour], 0, (0, 255, 0), -1)
+            elif len(approx) == 4:
+                shape.append("square")
+                cv2.drawContours(image_array, [contour], 0, (0, 0, 255), -1)
+            elif len(approx) == 9:
+                shape.append("half-circle")
+                cv2.drawContours(image_array, [contour], 0, (255, 255, 0), -1)
+            elif len(approx) > 15:
+                shape.append("circle")
+                cv2.drawContours(image_array, [contour], 0, (0, 255, 255), -1)
+
+        return shape[0]
+
+
+class ImageAnswers:
+    def __init__(self):
+        pass
+
+    def image_answer(
+        self, image_urls: list, highway_code_image_dict: dict, question: str
+    ):
+        """
+        Obtains the answer from the image answers. Uses the ImageComparison
+        class to obtain a caption for the images in the image_urls param.
+
+        Parameters
+        ----------
+        image_urls: list, a list of the image_urls on the page.
+        highway_code_image_dict: dict, the image bank to be used.
+        question: str, the question being asked.
+
+        Returns
+        -------
+        A string with the answer to the question
+
+        """
+        captions = []
+
+        # For each image url, obtain a caption
+        for image_url in image_urls:
+            threshold = 10
+            caption = ImageComparison().get_sign_meaning(
+                highway_code_image_dict=highway_code_image_dict,
+                test_img_url=image_url,
+                threshold=threshold,
+            )
+
+            captions.append(caption)
+
+        # Make a dictionary of captions and their corresponding urls
+        captions_dict = dict(zip(captions, image_urls))
+
+        # Make topics from the question
+        question_topics = CorrectAnswer().prepare_text_for_lda(text=question)
+
+        # Obtain the answer
+        try:
+            answer = [s for s in captions if any(xs in s for xs in question_topics)][0]
+            answer_outcome = "Answer obtained"
+            return answer, captions_dict, answer_outcome
+        except:
+            # In the event that an answer cannot be obtained
+            answer = ""
+            answer_outcome = "No answer obtained"
+            return answer, captions_dict, answer_outcome
+
+    def update_choices_dict(self, captions: list) -> dict:
+        """
+        Updates the choices_dict to contain the captions obtained from the func
+        image_answer.
+
+        Parameters
+        ----------
+        captions: list, a list of captions for the images obtained.
+
+        Returns
+        -------
+        A dict with the captions and the their corresponding question keys.
+
+        """
+        # Make a keys list
+        keys = ["questions-0", "questions-1", "questions-2", "questions-3"]
+
+        return dict(zip(captions, keys))
 
 
 class CorrectAnswer:
@@ -561,11 +964,65 @@ class CorrectAnswer:
         # Obtain the correct answer from the highest score given
         correct_answer = ""
 
+        # Evaluate if the score_dict contains duplicate scores
+        duplicate_answers = []
         for choice, score in score_dict.items():
             if score == max(list(score_dict.values())):
-                correct_answer = choice
+                duplicate_answers.append(choice)
+
+        if len(duplicate_answers) > 1:
+            print("Duplicate answers detected, using regex to find the answer")
+            # If there are multiple duplicate_answers
+            duplicate_answer_scores = {}
+
+            for duplicate_answer in duplicate_answers:
+                # Process the answer
+                duplicate_answer_processed = CorrectAnswer().prepare_text_for_lda(text=duplicate_answer)
+
+                scores = []
+                for dap in duplicate_answer_processed:
+                    # Give each duplicate_answer a score based on all matches in the answer
+                    score = len(re.findall(dap, answer))
+                    scores.append(score)
+
+                scores = sum(scores)
+
+                # Make a dictionary of scores
+                duplicate_answer_scores[duplicate_answer] = scores
+
+            for choice, score in duplicate_answer_scores.items():
+                if score == max(list(duplicate_answer_scores.values())):
+                    correct_answer = choice
+        else:
+            # If there are no duplicate answers, choose the answer with the
+            # highest score
+            for choice, score in score_dict.items():
+                if score == max(list(score_dict.values())):
+                    correct_answer = choice
+
+        # If the correct_answer is still empty, choose a random one
+        if len(correct_answer) == 0:
+            correct_answer = CorrectAnswer().random_answer(
+                choices_dict=choices_dict
+            )
 
         return correct_answer
+
+    def random_answer(self, choices_dict: dict) -> str:
+        """
+        In the event that it cannot obtain an answer, it chooses a random one.
+
+        Parameters
+        ----------
+        choices_dict: dict, makes a dictionary of the multiple choices per page.
+
+        Returns
+        -------
+        A string with a random answer selected.
+
+        """
+        choices_list = list(choices_dict.keys())
+        return random.choice(choices_list)
 
 
 class StartTest:
@@ -604,7 +1061,9 @@ class StartTest:
 
         return driver
 
-    def identify_question(self, driver, question_class_name: str) -> str:
+    def identify_question(
+        self, driver, question_class_name: str, wait_time: int
+    ) -> str:
         """
         Identifies the question on the page the url is accessed and the test is started.
 
@@ -612,6 +1071,7 @@ class StartTest:
         ----------
         driver: the selenium used to open the webpage and start the test.
         question_class_name: str, the class name of the question.
+        wait_time: int, the time (in seconds) to wait
 
         Returns
         -------
@@ -619,7 +1079,7 @@ class StartTest:
 
         """
         # Wait 10 seconds until the page loads
-        buddy = WebDriverWait(driver, 10).until(
+        buddy = WebDriverWait(driver, wait_time).until(
             EC.visibility_of_element_located((By.CLASS_NAME, question_class_name))
         )
 
@@ -628,7 +1088,25 @@ class StartTest:
 
         return question.text
 
-    def identify_choices(self, driver, choice_class_name: str):
+    def identify_shape_question(self, question: str) -> bool:
+        """
+        Identifies whether the word 'shape' is present within the question.
+
+        Parameters
+        ----------
+        question: str, the initial question input.
+
+        Returns
+        -------
+        A bool to indicate whether the question is asking about shapes.
+
+        """
+        if "shape" in question:
+            return True
+        else:
+            return False
+
+    def identify_choices(self, driver, choice_class_name: str, wait_time: int):
         """
         Identifies the multiple choices per page.
 
@@ -636,6 +1114,7 @@ class StartTest:
         ----------
         driver: the selenium driver used to open the webpage and start the test.
         choice_class_name: str, the name of the overall multiple choices per page.
+        wait_time: int, the time (in seconds) to wait
 
         Returns
         -------
@@ -643,7 +1122,7 @@ class StartTest:
 
         """
         # Wait 10 seconds until the page loads
-        buddy = WebDriverWait(driver, 10).until(
+        buddy = WebDriverWait(driver, wait_time).until(
             EC.visibility_of_element_located((By.CLASS_NAME, choice_class_name))
         )
 
@@ -672,6 +1151,33 @@ class StartTest:
         keys = ["questions-0", "questions-1", "questions-2", "questions-3"]
 
         return dict(zip(choices_list, keys))
+
+    def evaluate_choices_dict(self, choices_dict: dict) -> bool:
+        """
+        Evaluates to see if the choices_dict created is empty. If True
+        returned then this means that the choices in the page do not
+        contain text; they contain images.
+
+        Parameters
+        ----------
+        choices_dict: dict, a dictionary of choices made from the
+        make_choices_dict func.
+
+        Returns
+        -------
+        A bool, indicating whether or not the choices dict is empty or not.
+
+        """
+        # Make a list of keys
+        choices_dict_keys = list(choices_dict.keys())
+
+        # Return the outcome
+        if "" in choices_dict_keys:
+            outcome = True
+        else:
+            outcome = False
+
+        return outcome
 
     def click_answer(self, driver, correct_answer: str, choices_dict: dict):
         """
@@ -728,3 +1234,53 @@ class StartTest:
 
         """
         driver.find_element_by_class_name(end_button_id).click()
+
+
+class Logging:
+    """
+    Logs all messages and outputs from the bot.
+
+    """
+
+    def __init__(self):
+        pass
+
+    def create_filename(self, filepath: str) -> str:
+        """
+        Creates a filename with the latest date.
+
+        Parameters
+        ----------
+        filepath: str, the filepath of the logger file.
+
+        Returns
+        -------
+        A filename with the latest date.
+
+        """
+        today = date.today()
+        d1 = today.strftime("%d_%m_%Y")
+
+        return filepath + "/driving_theory_log_" + d1 + ".txt"
+
+    def create_logging_config(self, filepath: str):
+        """
+        Creates a configuration to be used for logging purposes.
+
+        Parameters
+        ----------
+        filepath: str, the filepath of the logger file.
+
+        Returns
+        -------
+
+        """
+        filename = Logging().create_filename(filepath=filepath)
+
+        return logging.basicConfig(
+            filename=filename,
+            filemode="a",
+            format="%(asctime)s - %(message)s",
+            datefmt="%d-%b-%y %H:%M:%S",
+            level=logging.INFO,
+        )
