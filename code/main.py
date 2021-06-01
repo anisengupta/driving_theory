@@ -4,9 +4,7 @@ from IPython.display import clear_output
 import logging
 
 # Functions
-def evaluate_per_page(driver,
-                      highway_code_image_dict: dict,
-                      filepath: str):
+def evaluate_per_page(driver, highway_code_image_dict: dict):
     """
     Evaluates an answer to a question given some multiple choices per page in the following
     fashion:
@@ -23,16 +21,12 @@ def evaluate_per_page(driver,
     driver: the selenium driver used to open the webpage and start the test.
     highway_code_image_dict: dict, an image bank of dicts obtained from
     the Highway Code website.
-    filepath: str, the filepath of the logger file.
 
     Returns
     -------
     A page evaluate with an answer chosen.
 
     """
-    # Initiate the logger
-    driving_theory.Logging().create_logging_config(filepath=filepath)
-
     # Identify the question
     logging.info("Identifying the questions")
     question_class_name = "govuk-fieldset__heading"
@@ -99,7 +93,9 @@ def evaluate_per_page(driver,
                     driver=driver, accept_button_xpath=accept_button_xpath, wait_time=1
                 )
             except:
-                logging.info("Looks like the cookies have already been accepted, continuing")
+                logging.info(
+                    "Looks like the cookies have already been accepted, continuing"
+                )
                 # Note that if an exception is returned, it means that
                 # cookies are already accepted
                 pass
@@ -144,7 +140,9 @@ def evaluate_per_page(driver,
 
         if choices_dict_eval:
             logging.info("Looks like there are empty strings in the choices_dict")
-            logging.info("This means that the answers do not contain text, they contain images")
+            logging.info(
+                "This means that the answers do not contain text, they contain images"
+            )
             # If the choices_dict_eval is True - it contains empty strings
             image_answers_class_name = "choice-image"
             logging.info("Obtaining the image urls of the answers")
@@ -153,22 +151,26 @@ def evaluate_per_page(driver,
             )
 
             # Identify whether the question being asked is a shape one
-            logging.info('Identifying whether the question being asked is a shape one')
+            logging.info("Identifying whether the question being asked is a shape one")
             shape_question = driving_theory.StartTest().identify_shape_question(
                 question=question
             )
 
             if shape_question:
-                logging.info('Looks like a shape question is detected')
+                logging.info("Looks like a shape question is detected")
                 shapes = []
 
-                logging.info('Obtaining the shapes for the images')
+                logging.info("Obtaining the shapes for the images")
                 for image_url in image_urls:
-                    shape = driving_theory.ImageComparison().detect_shape(image_url=image_url)
+                    shape = driving_theory.ImageComparison().detect_shape(
+                        image_url=image_url
+                    )
                     shapes.append(shape)
 
-                logging.info('Updating the choices_dict with the images shapes')
-                choices_dict = driving_theory.ImageAnswers().update_choices_dict(captions=shapes)
+                logging.info("Updating the choices_dict with the images shapes")
+                choices_dict = driving_theory.ImageAnswers().update_choices_dict(
+                    captions=shapes
+                )
             else:
                 logging.info(
                     "Attempting to obtain an answer, a captions_dict and the answers_outcome"
@@ -198,7 +200,9 @@ def evaluate_per_page(driver,
                         captions=captions
                     )
                 else:
-                    logging.info("An answer was not obtained, keeping the choices_dict the same")
+                    logging.info(
+                        "An answer was not obtained, keeping the choices_dict the same"
+                    )
                     # If no answer is obtained then do not change the choices_dict
                     choices_dict = choices_dict
 
@@ -220,6 +224,7 @@ def evaluate_per_page(driver,
     correct_answer = driving_theory.CorrectAnswer().obtain_correct_answer(
         question=question, answer=answer, choices_dict=choices_dict
     )
+    logging.info(correct_answer)
 
     # Click on the answer
     logging.info("Clicking on the answer")
@@ -227,9 +232,10 @@ def evaluate_per_page(driver,
         driver=driver, correct_answer=correct_answer, choices_dict=choices_dict
     )
     clear_output(wait=True)
+    logging.info(' ')
 
 
-def evaluate_all_pages(driver):
+def evaluate_all_pages(driver, highway_code_image_dict: dict):
     """
     Evaluates all the pages in the driving test using the evaluate_per_page func.
     Uses recursion to keep on evaluating pages until there is none left to evaluate.
@@ -237,23 +243,17 @@ def evaluate_all_pages(driver):
     Parameters
     ----------
     driver: the selenium driver used to open the webpage and start the test.
+    highway_code_image_dict: dict, a dict of Highway Code images.
 
     Returns
     -------
     All the pages evaluated in the driving theory test.
 
     """
-    # Make an image bank of the highway code images
-    logging.info("Making an image bank of Highway Code images")
-    highway_code_url = "https://www.gov.uk/guidance/the-highway-code/traffic-signs"
-    highway_code_image_dict = (
-        driving_theory.ImageComparison().make_highway_code_image_dict(
-            url=highway_code_url
-        )
-    )
-
     # Evaluate the page
-    evaluate_per_page(driver, highway_code_image_dict=highway_code_image_dict)
+    evaluate_per_page(
+        driver, highway_code_image_dict=highway_code_image_dict
+    )
 
     # Go onto next page
     next_page_button_id = "btn-next"
@@ -262,7 +262,7 @@ def evaluate_all_pages(driver):
     )
 
     # Recursively complete all pages
-    evaluate_all_pages(driver)
+    evaluate_all_pages(driver, highway_code_image_dict)
 
 
 def complete_theory_test():
@@ -279,10 +279,27 @@ def complete_theory_test():
     url = "https://www.safedrivingforlife.info/free-practice-tests/practice-theory-test-for-car-drivers-1-of-2/"
     start_xpath = '//*[@id="main-content"]/div[1]/div/div[2]/button'
 
+    # Initiate the logger
+    logger_filepath = '/Users/aniruddha.sengupta/Desktop/Driving_Theory/logs'
+    driving_theory.Logging().create_logging_config(filepath=logger_filepath)
+
+    # Make an image bank of the highway code images
+    logging.info("Making an image bank of Highway Code images")
+    highway_code_url = "https://www.gov.uk/guidance/the-highway-code/traffic-signs"
+    highway_code_image_dict = (
+        driving_theory.ImageComparison().make_highway_code_image_dict(
+            url=highway_code_url
+        )
+    )
+
     # Start the test
+    logging.info('Starting the test')
     driver = driving_theory.StartTest().open_webpage(url=url, start_xpath=start_xpath)
 
-    evaluate_all_pages(driver)
+    try:
+        evaluate_all_pages(driver, highway_code_image_dict)
+    except:
+        logging.info('The test has now ended')
 
 
 def main():

@@ -27,7 +27,7 @@ from bs4 import BeautifulSoup
 from IPython.display import Image, HTML, clear_output
 from PIL import Image, ImageChops, ImageStat
 from skimage import io
-from re import search
+import re
 from datetime import date
 import logging
 
@@ -971,18 +971,40 @@ class CorrectAnswer:
                 duplicate_answers.append(choice)
 
         if len(duplicate_answers) > 1:
-            print('Duplicate answers detected, using regex to find the answer')
+            print("Duplicate answers detected, using regex to find the answer")
             # If there are multiple duplicate_answers
+            duplicate_answer_scores = {}
+
             for duplicate_answer in duplicate_answers:
-                # use regex.search to search for the correct one
-                if search(duplicate_answer, answer):
-                    correct_answer = duplicate_answer
+                # Process the answer
+                duplicate_answer_processed = CorrectAnswer().prepare_text_for_lda(text=duplicate_answer)
+
+                scores = []
+                for dap in duplicate_answer_processed:
+                    # Give each duplicate_answer a score based on all matches in the answer
+                    score = len(re.findall(dap, answer))
+                    scores.append(score)
+
+                scores = sum(scores)
+
+                # Make a dictionary of scores
+                duplicate_answer_scores[duplicate_answer] = scores
+
+            for choice, score in duplicate_answer_scores.items():
+                if score == max(list(duplicate_answer_scores.values())):
+                    correct_answer = choice
         else:
             # If there are no duplicate answers, choose the answer with the
             # highest score
             for choice, score in score_dict.items():
                 if score == max(list(score_dict.values())):
                     correct_answer = choice
+
+        # If the correct_answer is still empty, choose a random one
+        if len(correct_answer) == 0:
+            correct_answer = CorrectAnswer().random_answer(
+                choices_dict=choices_dict
+            )
 
         return correct_answer
 
@@ -1079,7 +1101,7 @@ class StartTest:
         A bool to indicate whether the question is asking about shapes.
 
         """
-        if 'shape' in question:
+        if "shape" in question:
             return True
         else:
             return False
@@ -1219,6 +1241,7 @@ class Logging:
     Logs all messages and outputs from the bot.
 
     """
+
     def __init__(self):
         pass
 
@@ -1238,7 +1261,7 @@ class Logging:
         today = date.today()
         d1 = today.strftime("%d_%m_%Y")
 
-        return filepath + '/driving_theory_log_' + d1 + '.txt'
+        return filepath + "/driving_theory_log_" + d1 + ".txt"
 
     def create_logging_config(self, filepath: str):
         """
@@ -1254,8 +1277,10 @@ class Logging:
         """
         filename = Logging().create_filename(filepath=filepath)
 
-        return logging.basicConfig(filename=filename,
-                                   filemode='a',
-                                   format='%(asctime)s - %(message)s',
-                                   datefmt='%d-%b-%y %H:%M:%S',
-                                   level=logging.DEBUG)
+        return logging.basicConfig(
+            filename=filename,
+            filemode="a",
+            format="%(asctime)s - %(message)s",
+            datefmt="%d-%b-%y %H:%M:%S",
+            level=logging.INFO,
+        )
