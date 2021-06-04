@@ -177,4 +177,6 @@ Once an answer has been obtained, the rest of the process is then executed to ob
 
 For a more detailed picture of the answering pipeline, please see this link:
 
+https://raw.githubusercontent.com/anisengupta/driving_theory/main/images/flowchart/driving_theory_flowchart_v2.png
+
 
