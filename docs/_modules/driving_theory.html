@@ -1,0 +1,1491 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="English" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>driving_theory &mdash; Driving Theory Documentation 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Driving Theory Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guide.html">Step by step guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">Code Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Driving Theory Documentation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>driving_theory</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for driving_theory</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Initial Config</span>
+<span class="kn">import</span> <span class="nn">spacy</span>
+
+<span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;en_core_web_sm&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spacy.lang.en</span> <span class="kn">import</span> <span class="n">English</span>
+
+<span class="n">parser</span> <span class="o">=</span> <span class="n">English</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">nltk</span>
+
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s2">&quot;wordnet&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">wordnet</span> <span class="k">as</span> <span class="n">wn</span>
+<span class="kn">from</span> <span class="nn">nltk.stem.wordnet</span> <span class="kn">import</span> <span class="n">WordNetLemmatizer</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">from</span> <span class="nn">requests_html</span> <span class="kn">import</span> <span class="n">HTML</span>
+<span class="kn">from</span> <span class="nn">requests_html</span> <span class="kn">import</span> <span class="n">HTMLSession</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageChops</span><span class="p">,</span> <span class="n">ImageStat</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
+
+<span class="c1"># Classes</span>
+<div class="viewcode-block" id="AnswerSearch"><a class="viewcode-back" href="../code.html#driving_theory.AnswerSearch">[docs]</a><span class="k">class</span> <span class="nc">AnswerSearch</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class searches for the answer to the multiple-choice question by utilising</span>
+<span class="sd">    Google and retrieving an answer in the form of the first description available.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="AnswerSearch.get_source"><a class="viewcode-back" href="../code.html#driving_theory.AnswerSearch.get_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a HTML session by retrieving a response from the URL.</span>
+<span class="sd">        If the retrieval is successful, a response 200 will be returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        url: str, the URL param.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A response with a relevant code.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">HTMLSession</span><span class="p">()</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnswerSearch.get_results"><a class="viewcode-back" href="../code.html#driving_theory.AnswerSearch.get_results">[docs]</a>    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses the func get_source to return the results of the google search</span>
+<span class="sd">        based on the query param.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        query: str, the query to be searched.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A response with a relevant code. If it is 200, then the retrieval</span>
+<span class="sd">        is successful.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">AnswerSearch</span><span class="p">()</span><span class="o">.</span><span class="n">get_source</span><span class="p">(</span>
+            <span class="s2">&quot;https://www.google.co.uk/search?q=&quot;</span> <span class="o">+</span> <span class="n">query</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="AnswerSearch.answer_search"><a class="viewcode-back" href="../code.html#driving_theory.AnswerSearch.answer_search">[docs]</a>    <span class="k">def</span> <span class="nf">answer_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Searches for an answer to a question based on a Google search.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        question: str, the initial question input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with the answer to the question.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">AnswerSearch</span><span class="p">()</span><span class="o">.</span><span class="n">get_results</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+        <span class="n">css_identifier_text</span> <span class="o">=</span> <span class="s2">&quot;.hgKElc&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">css_identifier_text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">css_identifier_text</span><span class="p">,</span> <span class="n">first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="ImageDetection"><a class="viewcode-back" href="../code.html#driving_theory.ImageDetection">[docs]</a><span class="k">class</span> <span class="nc">ImageDetection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class attempts to detect an image in a multiple choice question.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="ImageDetection.detect_image_question"><a class="viewcode-back" href="../code.html#driving_theory.ImageDetection.detect_image_question">[docs]</a>    <span class="k">def</span> <span class="nf">detect_image_question</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">image_xpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assesses whether an image is present on the given xpath.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        image_xpath: str, the xpath of the image to look for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A bool and the body of the image, if present on the page.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">outcome</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">image_body</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1"># Determine if the image body is present on the page</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">image_body</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="n">image_xpath</span><span class="p">)</span>
+            <span class="n">outcome</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">image_body</span></div>
+
+<div class="viewcode-block" id="ImageDetection.get_image_url"><a class="viewcode-back" href="../code.html#driving_theory.ImageDetection.get_image_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_body</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the url of the image if present on the page. Image body is created</span>
+<span class="sd">        from the func detect_image.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        image_body: the selenium webdriver WebElement, generated from the detect_image func.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The url of the image.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">image_body</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageDetection.detect_image_answers"><a class="viewcode-back" href="../code.html#driving_theory.ImageDetection.detect_image_answers">[docs]</a>    <span class="k">def</span> <span class="nf">detect_image_answers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">image_answers_class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detects whether the answers themselves are images.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        image_answers_class_name: str, the class name of the image answers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A list of image urls of the answers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Returns a list of images</span>
+        <span class="n">image_body</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="n">image_answers_class_name</span><span class="p">)</span>
+
+        <span class="c1"># Image urls</span>
+        <span class="n">image_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">body</span> <span class="ow">in</span> <span class="n">image_body</span><span class="p">:</span>
+            <span class="n">image_url</span> <span class="o">=</span> <span class="n">ImageDetection</span><span class="p">()</span><span class="o">.</span><span class="n">get_image_url</span><span class="p">(</span><span class="n">image_body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+            <span class="n">image_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">image_urls</span></div></div>
+
+
+<div class="viewcode-block" id="ImageSearch"><a class="viewcode-back" href="../code.html#driving_theory.ImageSearch">[docs]</a><span class="k">class</span> <span class="nc">ImageSearch</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In the event that a pictorial question is asked (&#39;What is this sign?&#39;); class attempts to</span>
+<span class="sd">    search the image using its URL and a different tab to the one already being used</span>
+<span class="sd">    for the test.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="ImageSearch.new_tab"><a class="viewcode-back" href="../code.html#driving_theory.ImageSearch.new_tab">[docs]</a>    <span class="k">def</span> <span class="nf">new_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens a new tab on an already existing webdriver.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A new tab being opened on the webpage opened.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;window.open(&#39;&#39;,&#39;_blank&#39;);&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageSearch.switch_tab"><a class="viewcode-back" href="../code.html#driving_theory.ImageSearch.switch_tab">[docs]</a>    <span class="k">def</span> <span class="nf">switch_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Switches the tab of the driver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The control being passed to the tab just opened using the new_tab func.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">window_handles</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">window_handles</span>
+
+        <span class="n">driver</span><span class="o">.</span><span class="n">switch_to_window</span><span class="p">(</span><span class="n">window_handles</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ImageSearch.switch_to_original_tab"><a class="viewcode-back" href="../code.html#driving_theory.ImageSearch.switch_to_original_tab">[docs]</a>    <span class="k">def</span> <span class="nf">switch_to_original_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Switches back control to the original tab of the driver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Control being switched over to the original tab to carry on the test.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">window_handles</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">window_handles</span>
+
+        <span class="n">driver</span><span class="o">.</span><span class="n">switch_to_window</span><span class="p">(</span><span class="n">window_handles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ImageSearch.accept_google_search_cookies"><a class="viewcode-back" href="../code.html#driving_theory.ImageSearch.accept_google_search_cookies">[docs]</a>    <span class="k">def</span> <span class="nf">accept_google_search_cookies</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">accept_button_xpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wait_time</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accepts the cookies on Google search.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        accept_button_xpath: str, the xpath of the accept button.</span>
+<span class="sd">        wait_time: int, the time (in seconds) to wait</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Accepts the cookies on Google search and allows you to continue</span>
+<span class="sd">        with the search.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">buddy</span> <span class="o">=</span> <span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">wait_time</span><span class="p">)</span><span class="o">.</span><span class="n">until</span><span class="p">(</span>
+            <span class="n">EC</span><span class="o">.</span><span class="n">visibility_of_element_located</span><span class="p">((</span><span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="n">accept_button_xpath</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">buddy</span><span class="o">.</span><span class="n">click</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ImageSearch.close_tab"><a class="viewcode-back" href="../code.html#driving_theory.ImageSearch.close_tab">[docs]</a>    <span class="k">def</span> <span class="nf">close_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Closes the tab of the current driver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The tab being closed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ImageSearch.image_search"><a class="viewcode-back" href="../code.html#driving_theory.ImageSearch.image_search">[docs]</a>    <span class="k">def</span> <span class="nf">image_search</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">driver</span><span class="p">,</span>
+        <span class="n">image_url_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">cam_button_xpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">url_tab_xpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">image_url_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">search_button_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">first_answer_xpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Conducts an image search on Google images based on the image_url_path param.</span>
+<span class="sd">        Once searches are made, it returns the first answer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        image_url_path: str, the url of the image to be searched.</span>
+<span class="sd">        cam_button_xpath: str, the xpath of the camera icon button.</span>
+<span class="sd">        url_tab_xpath: str, the xpath of the url tab.</span>
+<span class="sd">        image_url_id: str, the id of the image url input.</span>
+<span class="sd">        search_button_id: str, the id of the search button to be clicked.</span>
+<span class="sd">        first_answer_xpath: str, the xpath of the first answer.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        An answer to what the image could be according to Google image search.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Open Google Image search in the other tab</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://www.google.com/imghp?hl=EN&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Find cam button</span>
+        <span class="n">cam_button</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="n">cam_button_xpath</span><span class="p">)</span>
+        <span class="n">cam_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="c1"># Find image url tab</span>
+        <span class="n">url_tab</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="n">url_tab_xpath</span><span class="p">)</span>
+        <span class="n">url_tab</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="c1"># Set the image url</span>
+        <span class="n">image_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="n">image_url_id</span><span class="p">)</span>
+        <span class="n">image_url</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">image_url</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">image_url_path</span><span class="p">)</span>
+
+        <span class="c1"># Click on the search button</span>
+        <span class="n">submit_button</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="n">search_button_id</span><span class="p">)</span>
+        <span class="n">submit_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="c1"># Identify the answer</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="n">first_answer_xpath</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">answer</span><span class="o">.</span><span class="n">text</span></div></div>
+
+
+<div class="viewcode-block" id="ImageComparison"><a class="viewcode-back" href="../code.html#driving_theory.ImageComparison">[docs]</a><span class="k">class</span> <span class="nc">ImageComparison</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class compares an image compared to an image bank and determines its caption.</span>
+<span class="sd">    Best suited for questions related to identify Highway Code signs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="ImageComparison.make_highway_code_image_bank"><a class="viewcode-back" href="../code.html#driving_theory.ImageComparison.make_highway_code_image_bank">[docs]</a>    <span class="k">def</span> <span class="nf">make_highway_code_image_bank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HTML</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes a bank of images from the highway code.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        url: str, the url to be accessed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A dataframe with images and their captions</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Parse the page and put it into BeautifulSoup</span>
+        <span class="n">html_page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html_page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+        <span class="n">images</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;img&quot;</span><span class="p">)</span>
+
+        <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+            <span class="c1"># Retrieve the caption and the image url</span>
+            <span class="n">image_url</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">]</span>
+            <span class="n">img_src</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">image_url</span><span class="si">}</span><span class="s1">&quot;/&gt;&#39;</span>
+            <span class="n">caption</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;alt&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Put the caption and image into a row</span>
+            <span class="n">row_1</span> <span class="o">=</span> <span class="p">[</span><span class="n">img_src</span><span class="p">,</span> <span class="n">caption</span><span class="p">]</span>
+
+            <span class="c1"># Put the row into the dataframe and transpose it</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">row_1</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+            <span class="c1"># Give the dataframe some columns</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Image&quot;</span><span class="p">,</span> <span class="s2">&quot;Caption&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Append the df to the df_list</span>
+            <span class="n">df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="n">all_images_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">HTML</span><span class="p">(</span><span class="n">all_images_df</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">escape</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ImageComparison.make_highway_code_image_dict"><a class="viewcode-back" href="../code.html#driving_theory.ImageComparison.make_highway_code_image_dict">[docs]</a>    <span class="k">def</span> <span class="nf">make_highway_code_image_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes a dictionary of image urls and their relevant captions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        url: str, the url to be accessed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Parse the page and put it into BeautifulSoup</span>
+        <span class="n">html_page</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html_page</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+        <span class="n">images</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;img&quot;</span><span class="p">)</span>
+
+        <span class="n">image_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">captions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+            <span class="c1"># Retrieve the caption and the image url</span>
+            <span class="n">image_url</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">]</span>
+            <span class="n">caption</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;alt&quot;</span><span class="p">]</span>
+
+            <span class="n">image_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+            <span class="n">captions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">caption</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">image_urls</span><span class="p">,</span> <span class="n">captions</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ImageComparison.image_comparison"><a class="viewcode-back" href="../code.html#driving_theory.ImageComparison.image_comparison">[docs]</a>    <span class="k">def</span> <span class="nf">image_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_one</span><span class="p">,</span> <span class="n">image_two</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares two different images and returns a score by comparing their</span>
+<span class="sd">        values at the pixel level.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        image_one: the first image</span>
+<span class="sd">        image_two: the second image</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A float with the score of how similar the images are. The lower the number,</span>
+<span class="sd">        the more similar they are, with 0.0 indicating that they are the same image</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make sure that the images are the same sizes</span>
+        <span class="n">image_two</span> <span class="o">=</span> <span class="n">image_two</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image_one</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">ImageChops</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">image_one</span><span class="p">,</span> <span class="n">image_two</span><span class="p">)</span>
+
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">ImageStat</span><span class="o">.</span><span class="n">Stat</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+
+        <span class="n">diff_ratio</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">diff_ratio</span> <span class="o">*</span> <span class="mi">100</span></div>
+
+<div class="viewcode-block" id="ImageComparison.get_sign_meaning"><a class="viewcode-back" href="../code.html#driving_theory.ImageComparison.get_sign_meaning">[docs]</a>    <span class="k">def</span> <span class="nf">get_sign_meaning</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">highway_code_image_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">test_img_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the caption of a sign based on the available image bank; highlighted in the</span>
+<span class="sd">        highway_code_image_dict param.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        highway_code_image_dict: dict, the image bank to be used.</span>
+<span class="sd">        test_img_url: str, the url of the image to be tested.</span>
+<span class="sd">        threshold: int, the threshold to consider for the min_score computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A caption of the test image.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make a list of image urls from the database</span>
+        <span class="n">controls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">highway_code_image_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># Load the test image</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">test_img_url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">raw</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># For each control image from the image bank</span>
+        <span class="k">for</span> <span class="n">control</span> <span class="ow">in</span> <span class="n">controls</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Testing test image against </span><span class="si">{</span><span class="n">highway_code_image_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">control</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Load the control image</span>
+            <span class="n">control_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">raw</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span>
+                <span class="s2">&quot;RGB&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Compute a score</span>
+            <span class="n">img_score</span> <span class="o">=</span> <span class="n">ImageComparison</span><span class="p">()</span><span class="o">.</span><span class="n">image_comparison</span><span class="p">(</span>
+                <span class="n">image_one</span><span class="o">=</span><span class="n">test</span><span class="p">,</span> <span class="n">image_two</span><span class="o">=</span><span class="n">control_img</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Append the score to the overall scores list</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img_score</span><span class="p">)</span>
+
+        <span class="c1"># Make a dictionary of the scores and the image urls</span>
+        <span class="n">scores_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">controls</span><span class="p">))</span>
+
+        <span class="c1"># Compute the minimum score</span>
+        <span class="n">min_score</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+
+        <span class="c1"># If the min score is less than the threshold, return the caption</span>
+        <span class="k">if</span> <span class="n">min_score</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">highway_code_image_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">scores_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">min_score</span><span class="p">))</span>
+
+        <span class="c1"># Else, the image caption cannot be found</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">no_caption_outcome</span> <span class="o">=</span> <span class="s2">&quot;No caption found&quot;</span>
+            <span class="k">return</span> <span class="n">no_caption_outcome</span></div>
+
+<div class="viewcode-block" id="ImageComparison.detect_shape"><a class="viewcode-back" href="../code.html#driving_theory.ImageComparison.detect_shape">[docs]</a>    <span class="k">def</span> <span class="nf">detect_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detects the shape of an image. Note that this is a simple method</span>
+<span class="sd">        and can only detect shapes of images that are regular: circle, rectangle, pentagon,</span>
+<span class="sd">        square etc.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        image_url: str, the url of the image to be tested.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with the shape of the image.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Open image with pillow</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">image_url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">raw</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Convert the image into an array</span>
+        <span class="n">image_array</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+
+        <span class="c1"># Convert the image array into grayscale</span>
+        <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">image</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2GRAY</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Compute the threshold</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">thresh</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Find the contours</span>
+        <span class="n">contours</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findContours</span><span class="p">(</span><span class="n">thresh</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># For each contour</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">contour</span> <span class="ow">in</span> <span class="n">contours</span><span class="p">:</span>
+            <span class="c1"># Approximate the shape</span>
+            <span class="n">approx</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">approxPolyDP</span><span class="p">(</span>
+                <span class="n">contour</span><span class="p">,</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">cv2</span><span class="o">.</span><span class="n">arcLength</span><span class="p">(</span><span class="n">contour</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">approx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;pentagon&quot;</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="p">[</span><span class="n">contour</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">approx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;triangle&quot;</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="p">[</span><span class="n">contour</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">approx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;square&quot;</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="p">[</span><span class="n">contour</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">approx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;half-circle&quot;</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="p">[</span><span class="n">contour</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">approx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="p">[</span><span class="n">contour</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="ImageAnswers"><a class="viewcode-back" href="../code.html#driving_theory.ImageAnswers">[docs]</a><span class="k">class</span> <span class="nc">ImageAnswers</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class attempts to obtain the answers for image questions.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="ImageAnswers.image_answer"><a class="viewcode-back" href="../code.html#driving_theory.ImageAnswers.image_answer">[docs]</a>    <span class="k">def</span> <span class="nf">image_answer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">highway_code_image_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtains the answer from the image answers. Uses the ImageComparison</span>
+<span class="sd">        class to obtain a caption for the images in the image_urls param.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        image_urls: list, a list of the image_urls on the page.</span>
+<span class="sd">        highway_code_image_dict: dict, the image bank to be used.</span>
+<span class="sd">        question: str, the question being asked.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with the answer to the question</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">captions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># For each image url, obtain a caption</span>
+        <span class="k">for</span> <span class="n">image_url</span> <span class="ow">in</span> <span class="n">image_urls</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="n">caption</span> <span class="o">=</span> <span class="n">ImageComparison</span><span class="p">()</span><span class="o">.</span><span class="n">get_sign_meaning</span><span class="p">(</span>
+                <span class="n">highway_code_image_dict</span><span class="o">=</span><span class="n">highway_code_image_dict</span><span class="p">,</span>
+                <span class="n">test_img_url</span><span class="o">=</span><span class="n">image_url</span><span class="p">,</span>
+                <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">captions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">caption</span><span class="p">)</span>
+
+        <span class="c1"># Make a dictionary of captions and their corresponding urls</span>
+        <span class="n">captions_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">captions</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">))</span>
+
+        <span class="c1"># Make topics from the question</span>
+        <span class="n">question_topics</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">prepare_text_for_lda</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">question</span><span class="p">)</span>
+
+        <span class="c1"># Obtain the answer</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">captions</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">xs</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">question_topics</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">answer_outcome</span> <span class="o">=</span> <span class="s2">&quot;Answer obtained&quot;</span>
+            <span class="k">return</span> <span class="n">answer</span><span class="p">,</span> <span class="n">captions_dict</span><span class="p">,</span> <span class="n">answer_outcome</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1"># In the event that an answer cannot be obtained</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">answer_outcome</span> <span class="o">=</span> <span class="s2">&quot;No answer obtained&quot;</span>
+            <span class="k">return</span> <span class="n">answer</span><span class="p">,</span> <span class="n">captions_dict</span><span class="p">,</span> <span class="n">answer_outcome</span></div>
+
+<div class="viewcode-block" id="ImageAnswers.update_choices_dict"><a class="viewcode-back" href="../code.html#driving_theory.ImageAnswers.update_choices_dict">[docs]</a>    <span class="k">def</span> <span class="nf">update_choices_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">captions</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the choices_dict to contain the captions obtained from the func</span>
+<span class="sd">        image_answer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        captions: list, a list of captions for the images obtained.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A dict with the captions and the their corresponding question keys.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make a keys list</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;questions-0&quot;</span><span class="p">,</span> <span class="s2">&quot;questions-1&quot;</span><span class="p">,</span> <span class="s2">&quot;questions-2&quot;</span><span class="p">,</span> <span class="s2">&quot;questions-3&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">captions</span><span class="p">,</span> <span class="n">keys</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="CorrectAnswer"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer">[docs]</a><span class="k">class</span> <span class="nc">CorrectAnswer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class tries to determine the correct answer to the question presented. There are usually four answers</span>
+<span class="sd">    in multiple choice and the correct answer is tried to be determined from the initial question.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="CorrectAnswer.tokenize"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.tokenize">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits up the text body into smaller list in a list.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text: str, the initial body of text supplied.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A list of the text split up.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lda_tokens</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">orth_</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">token</span><span class="o">.</span><span class="n">like_url</span><span class="p">:</span>
+                <span class="n">lda_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;URL&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">token</span><span class="o">.</span><span class="n">orth_</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">):</span>
+                <span class="n">lda_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SCREEN_NAME&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lda_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">lower_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lda_tokens</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.get_lemma"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.get_lemma">[docs]</a>    <span class="k">def</span> <span class="nf">get_lemma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the meanings of words, synonyms and antonyms using the NLTK&#39;s wordnet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        word: str, the initial string input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with the meaning of the word returned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lemma</span> <span class="o">=</span> <span class="n">wn</span><span class="o">.</span><span class="n">morphy</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lemma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">word</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lemma</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.get_lemma2"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.get_lemma2">[docs]</a>    <span class="k">def</span> <span class="nf">get_lemma2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the root of the word input.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        word: str, the initial string input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string returning the root of the word input.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">WordNetLemmatizer</span><span class="p">()</span><span class="o">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">word</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.prepare_text_for_lda"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.prepare_text_for_lda">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_text_for_lda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the input text and returns the topics in a list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text: str, the initial text input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A list of words that are the topics of the initial text input.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s2">&quot;stopwords&quot;</span><span class="p">)</span>
+        <span class="n">en_stop</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">corpus</span><span class="o">.</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s2">&quot;english&quot;</span><span class="p">))</span>
+
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">]</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">en_stop</span><span class="p">]</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">CorrectAnswer</span><span class="o">.</span><span class="n">get_lemma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">tokens</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.unicode_to_ascii"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.unicode_to_ascii">[docs]</a>    <span class="k">def</span> <span class="nf">unicode_to_ascii</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a text input to its unicode equivalent.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        string: str, the string input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The unicode equivalent of the string input.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFD&quot;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">string</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.get_n_grams"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.get_n_grams">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_grams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the n-grams of a list based on the n param input.</span>
+
+<span class="sd">        If the input list is [&#39;brakes&#39;, &#39;warning&#39;, &#39;light&#39;, &#39;stays&#39;], then the n-grams</span>
+<span class="sd">        calculation will be [[&#39;brakes&#39;, &#39;warning&#39;], [&#39;warning&#39;, &#39;light&#39;], [&#39;light&#39;, &#39;stays&#39;]]</span>
+<span class="sd">        if the n param is 2.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text: list, the initial input list.</span>
+<span class="sd">        n: int, the initial integer to create the n-grams.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A list of n-grams.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make an empty list</span>
+        <span class="n">grams</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># For each index in the text list param - (n + 1)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">grams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="c1"># For each element in text within the range ending i + n</span>
+                <span class="c1"># append to grams</span>
+                <span class="p">[</span><span class="n">text</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)]</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">grams</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.get_grams"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.get_grams">[docs]</a>    <span class="k">def</span> <span class="nf">get_grams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes a dict of the unigrams, bigrams and the full question, uses the func</span>
+<span class="sd">        get_n_grams.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        question: str, the initial question being asked.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A dict of the unigrams, bigrams and the full question. From these we can create</span>
+<span class="sd">        a scoring system to determine the correct answer to a given question.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="n">question</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span>
+
+        <span class="n">unigrams</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">prepare_text_for_lda</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">question</span><span class="p">)</span>
+
+        <span class="n">bigrams</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">raw_bigrams</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">get_n_grams</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">bigrams</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">bigram</span> <span class="ow">in</span> <span class="n">raw_bigrams</span><span class="p">:</span>
+                <span class="n">bigrams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bigram</span><span class="p">))</span>
+
+        <span class="n">grams</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;unigrams&quot;</span><span class="p">:</span> <span class="n">unigrams</span><span class="p">,</span>
+            <span class="s2">&quot;bigrams&quot;</span><span class="p">:</span> <span class="n">bigrams</span><span class="p">,</span>
+            <span class="s2">&quot;complete&quot;</span><span class="p">:</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">unicode_to_ascii</span><span class="p">(</span><span class="n">question</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">grams</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.negative_question"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.negative_question">[docs]</a>    <span class="k">def</span> <span class="nf">negative_question</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines if a question is negative, eg Which of these is NOT true?</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        question: str, the initial question string input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A bool to determine whether the question input param.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">negative_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;NOT&quot;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">negative_pattern</span> <span class="ow">in</span> <span class="n">negative_patterns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">negative_pattern</span> <span class="ow">in</span> <span class="n">question</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.remove_question_from_answer"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.remove_question_from_answer">[docs]</a>    <span class="k">def</span> <span class="nf">remove_question_from_answer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes the initial question from the answer provided. Note that is assumed that the</span>
+<span class="sd">        answer input (text param) is scraped from a search engine.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text: str, the initial answer input.</span>
+<span class="sd">        question: str, the question input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with the question removed. If the answer does not contain the original</span>
+<span class="sd">        question, then the initial text input is just returned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Replace instances of single and double spaces</span>
+        <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">     </span><span class="se">\n</span><span class="s2">    &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.base_answer_method"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.base_answer_method">[docs]</a>    <span class="k">def</span> <span class="nf">base_answer_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choice</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The base method to choosing an answer to a question. Method naively makes a count</span>
+<span class="sd">        of how many times the choice appears in the answer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        choice: str, the answer choice.</span>
+<span class="sd">        answer: str, the answer, scraped from the web.</span>
+<span class="sd">        question: str, the question input param.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A score based on how many times the choice appears on the answer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Process the choice</span>
+        <span class="n">choice_processed</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">prepare_text_for_lda</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">choice</span><span class="p">)</span>
+
+        <span class="c1"># Process the answer</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">remove_question_from_answer</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">answer</span><span class="p">,</span> <span class="n">question</span><span class="o">=</span><span class="n">question</span>
+        <span class="p">)</span>
+        <span class="n">answer_processed</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">prepare_text_for_lda</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">answer</span><span class="p">)</span>
+
+        <span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">processed_choice</span> <span class="ow">in</span> <span class="n">choice_processed</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">processed_choice</span><span class="p">)</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">answer_processed</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">processed_choice</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">score</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.gram_answer_method"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.gram_answer_method">[docs]</a>    <span class="k">def</span> <span class="nf">gram_answer_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choice</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Another answering a multiple choice method that is slightly more complex than the</span>
+<span class="sd">        base method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        choice: str, the answer choice.</span>
+<span class="sd">        answer: str, the answer, scraped from the web.</span>
+<span class="sd">        question: str, the question input param.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A score based on the number of n-grams from the choice that appears in the question.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Process the answer</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">remove_question_from_answer</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">answer</span><span class="p">,</span> <span class="n">question</span><span class="o">=</span><span class="n">question</span>
+        <span class="p">)</span>
+        <span class="n">answer_processed</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">prepare_text_for_lda</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">answer</span><span class="p">)</span>
+
+        <span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">grams</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">get_grams</span><span class="p">(</span><span class="n">choice</span><span class="p">)</span>
+
+        <span class="n">mult</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;unigrams&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;bigrams&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;complete&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">gram_type</span> <span class="ow">in</span> <span class="n">grams</span><span class="p">:</span>
+            <span class="n">gram_type_score</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">gram</span> <span class="ow">in</span> <span class="n">grams</span><span class="p">[</span><span class="n">gram_type</span><span class="p">]:</span>
+                <span class="n">gram_type_score</span> <span class="o">+=</span> <span class="n">answer_processed</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">gram</span><span class="p">)</span>
+
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">mult</span><span class="p">[</span><span class="n">gram_type</span><span class="p">]</span> <span class="o">*</span> <span class="n">gram_type_score</span>
+
+        <span class="k">return</span> <span class="n">score</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.obtain_correct_answer"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.obtain_correct_answer">[docs]</a>    <span class="k">def</span> <span class="nf">obtain_correct_answer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">choices_dict</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempts to obtain the correct answer from the multiple choice values and</span>
+<span class="sd">        questions presented. Note that you also have to pass an answer to it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        question: str, the question input param.</span>
+<span class="sd">        answer: str, the answer, scraped from the web.</span>
+<span class="sd">        choices_dict: dict, makes a dictionary of the multiple choices per page.</span>
+<span class="sd">        Obtained from the func make_choices_dict in the StartTest class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with (hopefully) should be the right answer to the question.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make a list of choices from the choices_dict</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">choices_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># For each choice, evaluate its score</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">gram_answer_method</span><span class="p">(</span>
+                <span class="n">choice</span><span class="o">=</span><span class="n">choice</span><span class="p">,</span> <span class="n">answer</span><span class="o">=</span><span class="n">answer</span><span class="p">,</span> <span class="n">question</span><span class="o">=</span><span class="n">question</span>
+            <span class="p">)</span>
+
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+        <span class="c1"># Make a dictionary of the choices and their scores</span>
+        <span class="n">score_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="n">scores</span><span class="p">))</span>
+
+        <span class="c1"># Obtain the correct answer from the highest score given</span>
+        <span class="n">correct_answer</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># Evaluate if the score_dict contains duplicate scores</span>
+        <span class="n">duplicate_answers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">choice</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">score_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">score</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">score_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())):</span>
+                <span class="n">duplicate_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">choice</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">duplicate_answers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Duplicate answers detected, using regex to find the answer&quot;</span><span class="p">)</span>
+            <span class="c1"># If there are multiple duplicate_answers</span>
+            <span class="n">duplicate_answer_scores</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">for</span> <span class="n">duplicate_answer</span> <span class="ow">in</span> <span class="n">duplicate_answers</span><span class="p">:</span>
+                <span class="c1"># Process the answer</span>
+                <span class="n">duplicate_answer_processed</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">prepare_text_for_lda</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">duplicate_answer</span><span class="p">)</span>
+
+                <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">dap</span> <span class="ow">in</span> <span class="n">duplicate_answer_processed</span><span class="p">:</span>
+                    <span class="c1"># Give each duplicate_answer a score based on all matches in the answer</span>
+                    <span class="n">score</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">dap</span><span class="p">,</span> <span class="n">answer</span><span class="p">))</span>
+                    <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+                <span class="n">scores</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+
+                <span class="c1"># Make a dictionary of scores</span>
+                <span class="n">duplicate_answer_scores</span><span class="p">[</span><span class="n">duplicate_answer</span><span class="p">]</span> <span class="o">=</span> <span class="n">scores</span>
+
+            <span class="k">for</span> <span class="n">choice</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">duplicate_answer_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">duplicate_answer_scores</span><span class="o">.</span><span class="n">values</span><span class="p">())):</span>
+                    <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">choice</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If there are no duplicate answers, choose the answer with the</span>
+            <span class="c1"># highest score</span>
+            <span class="k">for</span> <span class="n">choice</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">score_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">score_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())):</span>
+                    <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">choice</span>
+
+        <span class="c1"># If the correct_answer is still empty, choose a random one</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">correct_answer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">CorrectAnswer</span><span class="p">()</span><span class="o">.</span><span class="n">random_answer</span><span class="p">(</span>
+                <span class="n">choices_dict</span><span class="o">=</span><span class="n">choices_dict</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">correct_answer</span></div>
+
+<div class="viewcode-block" id="CorrectAnswer.random_answer"><a class="viewcode-back" href="../code.html#driving_theory.CorrectAnswer.random_answer">[docs]</a>    <span class="k">def</span> <span class="nf">random_answer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choices_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In the event that it cannot obtain an answer, it chooses a random one.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        choices_dict: dict, makes a dictionary of the multiple choices per page.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with a random answer selected.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">choices_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">choices_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">choices_list</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="StartTest"><a class="viewcode-back" href="../code.html#driving_theory.StartTest">[docs]</a><span class="k">class</span> <span class="nc">StartTest</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class makes use of the selenium module and starts the driving theory test.</span>
+<span class="sd">    Note that this is assuming that the correct webdriver has already been downloaded</span>
+<span class="sd">    (for the relevant operating software) and initialised.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="StartTest.open_webpage"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.open_webpage">[docs]</a>    <span class="k">def</span> <span class="nf">open_webpage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_xpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens the webpage and starts the test.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        url: str, the initial starting URL.</span>
+<span class="sd">        start_xpath: the xpath of the start button.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A chrome browser navigated to the website and the test started.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initiate the Chrome driver</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="s2">&quot;/usr/local/bin/chromedriver&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Initiate the url to be accessed</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># Click the start button</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="n">start_xpath</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">driver</span></div>
+
+<div class="viewcode-block" id="StartTest.identify_question"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.identify_question">[docs]</a>    <span class="k">def</span> <span class="nf">identify_question</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">question_class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wait_time</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Identifies the question on the page the url is accessed and the test is started.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium used to open the webpage and start the test.</span>
+<span class="sd">        question_class_name: str, the class name of the question.</span>
+<span class="sd">        wait_time: int, the time (in seconds) to wait</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A string with the question being asked.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Wait 10 seconds until the page loads</span>
+        <span class="n">buddy</span> <span class="o">=</span> <span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">wait_time</span><span class="p">)</span><span class="o">.</span><span class="n">until</span><span class="p">(</span>
+            <span class="n">EC</span><span class="o">.</span><span class="n">visibility_of_element_located</span><span class="p">((</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="n">question_class_name</span><span class="p">))</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Identify the question</span>
+        <span class="n">question</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_class_name</span><span class="p">(</span><span class="n">question_class_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">question</span><span class="o">.</span><span class="n">text</span></div>
+
+<div class="viewcode-block" id="StartTest.identify_shape_question"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.identify_shape_question">[docs]</a>    <span class="k">def</span> <span class="nf">identify_shape_question</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Identifies whether the word &#39;shape&#39; is present within the question.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        question: str, the initial question input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A bool to indicate whether the question is asking about shapes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;shape&quot;</span> <span class="ow">in</span> <span class="n">question</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="StartTest.identify_choices"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.identify_choices">[docs]</a>    <span class="k">def</span> <span class="nf">identify_choices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">choice_class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wait_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Identifies the multiple choices per page.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        choice_class_name: str, the name of the overall multiple choices per page.</span>
+<span class="sd">        wait_time: int, the time (in seconds) to wait</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A selenium choices object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Wait 10 seconds until the page loads</span>
+        <span class="n">buddy</span> <span class="o">=</span> <span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">wait_time</span><span class="p">)</span><span class="o">.</span><span class="n">until</span><span class="p">(</span>
+            <span class="n">EC</span><span class="o">.</span><span class="n">visibility_of_element_located</span><span class="p">((</span><span class="n">By</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="n">choice_class_name</span><span class="p">))</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Identify the answers</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_class_name</span><span class="p">(</span><span class="n">choice_class_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">choices</span></div>
+
+<div class="viewcode-block" id="StartTest.make_choices_dict"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.make_choices_dict">[docs]</a>    <span class="k">def</span> <span class="nf">make_choices_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choices</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes a dictionary of the multiple choices per page.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        choices: the selenium like object, created with the identify choices func.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A dict of the choices as keys and a value assigned to them.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make choices list</span>
+        <span class="n">choices_list</span> <span class="o">=</span> <span class="n">choices</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Make a keys list</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;questions-0&quot;</span><span class="p">,</span> <span class="s2">&quot;questions-1&quot;</span><span class="p">,</span> <span class="s2">&quot;questions-2&quot;</span><span class="p">,</span> <span class="s2">&quot;questions-3&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">choices_list</span><span class="p">,</span> <span class="n">keys</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StartTest.evaluate_choices_dict"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.evaluate_choices_dict">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_choices_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choices_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates to see if the choices_dict created is empty. If True</span>
+<span class="sd">        returned then this means that the choices in the page do not</span>
+<span class="sd">        contain text; they contain images.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        choices_dict: dict, a dictionary of choices made from the</span>
+<span class="sd">        make_choices_dict func.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A bool, indicating whether or not the choices dict is empty or not.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make a list of keys</span>
+        <span class="n">choices_dict_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">choices_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># Return the outcome</span>
+        <span class="k">if</span> <span class="s2">&quot;&quot;</span> <span class="ow">in</span> <span class="n">choices_dict_keys</span><span class="p">:</span>
+            <span class="n">outcome</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">outcome</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">outcome</span></div>
+
+<div class="viewcode-block" id="StartTest.click_answer"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.click_answer">[docs]</a>    <span class="k">def</span> <span class="nf">click_answer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">correct_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">choices_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtains the id of the correct answer and proceeds to click on it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        correct_answer: str, the answer obtained from the func obtain_correct_answer</span>
+<span class="sd">        in the CorrectAnswer class.</span>
+<span class="sd">        choices_dict: a dict of the choices as keys and a value assigned to them. Made from</span>
+<span class="sd">        the func make_choices_dict in the StartTest class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The answer selected on the page.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find the id of the correct_answer</span>
+        <span class="n">correct_answer_id</span> <span class="o">=</span> <span class="n">choices_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">correct_answer</span><span class="p">)</span>
+
+        <span class="c1"># Make the driver click on the correct answer</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="n">correct_answer_id</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StartTest.next_page"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.next_page">[docs]</a>    <span class="k">def</span> <span class="nf">next_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">next_page_button_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Goes onto the next page to evaluate the choices to the question given.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        next_page_button_id: str, the id of the next-page button on the page.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The function goes to the next page</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Click the next page button</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="n">next_page_button_id</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StartTest.end_test"><a class="viewcode-back" href="../code.html#driving_theory.StartTest.end_test">[docs]</a>    <span class="k">def</span> <span class="nf">end_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">end_button_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ends the test by clicking on the &#39;End test&#39; button.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        driver: the selenium driver used to open the webpage and start the test.</span>
+<span class="sd">        end_button_id: str, the id of the end-test button on the page.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        The ending of the driving theory test.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_class_name</span><span class="p">(</span><span class="n">end_button_id</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Logging"><a class="viewcode-back" href="../code.html#driving_theory.Logging">[docs]</a><span class="k">class</span> <span class="nc">Logging</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logs all messages and outputs from the bot.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Logging.create_filename"><a class="viewcode-back" href="../code.html#driving_theory.Logging.create_filename">[docs]</a>    <span class="k">def</span> <span class="nf">create_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a filename with the latest date.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filepath: str, the filepath of the logger file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A filename with the latest date.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">today</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">_%m_%Y&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s2">&quot;/driving_theory_log_&quot;</span> <span class="o">+</span> <span class="n">d1</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span></div>
+
+<div class="viewcode-block" id="Logging.create_logging_config"><a class="viewcode-back" href="../code.html#driving_theory.Logging.create_logging_config">[docs]</a>    <span class="k">def</span> <span class="nf">create_logging_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a configuration to be used for logging purposes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filepath: str, the filepath of the logger file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">Logging</span><span class="p">()</span><span class="o">.</span><span class="n">create_filename</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+            <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%b-%y %H:%M:%S&quot;</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Aniruddha Sengupta.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
