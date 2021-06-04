@@ -570,6 +570,10 @@ class ImageComparison:
 
 
 class ImageAnswers:
+    """
+    Class attempts to obtain the answers for image questions.
+
+    """
     def __init__(self):
         pass
 
