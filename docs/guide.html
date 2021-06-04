@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Step by step guide &mdash; Driving Theory Documentation 0.0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Driving Theory Documentation 0.0.1 documentation" href="index.html"/>
+        <link rel="next" title="Code Documentation" href="code.html"/>
+        <link rel="prev" title="Driving Theory Documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Driving Theory Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Step by step guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-process-guide">The Process Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1">Step 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2">Step 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3">Step 3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4">Step 4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5">Step 5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#case-duplicate-answers">Case - Duplicate Answers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#case-image-answers">Case - Image Answers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#case-image-question">Case - Image Question</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Driving Theory Documentation</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Step by step guide</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="step-by-step-guide">
+<h1>Step by step guide<a class="headerlink" href="#step-by-step-guide" title="Permalink to this headline">¶</a></h1>
+<p>The Driving Theory repository contains code that creates a bot that is able to complete a multiple choice driving theory test.
+The idea came from my own experience where every night I would complete a number of theory tests as preparation leading upto my
+to my own real test. I was wondering whether it would be possible to create a bot that would complete the theory test for me by identifying the question
+and selecting the right answers.</p>
+<p>I wanted to go one step further than just creating a process that can identify answers to questions. I wanted
+to set up a system whereby I would simply set the code to run and sit back to watch the bot complete the test for me.
+This project therefore heavily relies on the Selenium module which can automate browsers. For more information, please see
+this documentation: <a class="reference external" href="https://www.selenium.dev/">https://www.selenium.dev/</a></p>
+<p>The project contains several classes in the file driving_theory.py. Each class represents a step in the process that is
+required in order for the bot to function.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>AnswerSearch</strong>: searches for the right answer</p></li>
+<li><p><strong>ImageDetection</strong>: searches for an image in the question</p></li>
+<li><p><strong>ImageAnswers</strong>: obtains the answers from image questions</p></li>
+<li><p><strong>CorrectAnswer</strong>: attempts to determine the correct answer</p></li>
+<li><p><strong>StartTest</strong>: starts the actual multiple choice test</p></li>
+<li><p><strong>Logging</strong>: logs all important messages</p></li>
+</ul>
+</div>
+<div class="section" id="the-process-guide">
+<h2>The Process Guide<a class="headerlink" href="#the-process-guide" title="Permalink to this headline">¶</a></h2>
+<p>We will now describe the general process undertaken. This is the simplest case, where the bot opens
+the correct webpage, identifies the question, determines that there are no pictorial questions or answers
+and executes the steps to answer to that question.</p>
+<div class="section" id="step-1">
+<h3>Step 1<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h3>
+<p>The first step to consider is to start the test and navigate our way to the page.
+The class <strong>StartTest</strong> contains a <em>open_webpage</em> function which takes in a URL and a
+<em>start_xpath</em> parameter. This is the start button of the page to be clicked on:</p>
+<img alt="_images/start_test.png" src="_images/start_test.png" />
+<p>We also make an image bank of highway code images (<a class="reference external" href="https://www.gov.uk/guidance/the-highway-code/traffic-signs">https://www.gov.uk/guidance/the-highway-code/traffic-signs</a>)
+which we will make use of later once we encounter pictorial questions:</p>
+<img alt="_images/highway_code_image_bank.png" src="_images/highway_code_image_bank.png" />
+</div>
+<div class="section" id="step-2">
+<h3>Step 2<a class="headerlink" href="#step-2" title="Permalink to this headline">¶</a></h3>
+<p>The second step, once the test has been started, is to identify the question:</p>
+<img alt="_images/identify_question.png" src="_images/identify_question.png" />
+</div>
+<div class="section" id="step-3">
+<h3>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h3>
+<p>The bot then identifies the choices it is presented to the question and stores
+the answers in a dictionary along with its respective ids:</p>
+<img alt="_images/identify_choices.png" src="_images/identify_choices.png" />
+<img alt="_images/choices_dict.png" src="_images/choices_dict.png" />
+</div>
+<div class="section" id="step-4">
+<h3>Step 4<a class="headerlink" href="#step-4" title="Permalink to this headline">¶</a></h3>
+<p>The bot then performs as a human would if they do not know the answer to the question; it Googles it:</p>
+<img alt="_images/google_answer.png" src="_images/google_answer.png" />
+<img alt="_images/answer.png" src="_images/answer.png" />
+<p>It then uses the NLTK module to dissect the answer into its relevant topics:</p>
+<img alt="_images/answer_processed.png" src="_images/answer_processed.png" />
+<p>For more information into this module and its amazing capabilities, please see its documentation:
+<a class="reference external" href="https://www.nltk.org/">https://www.nltk.org/</a></p>
+<p>For each answer identified, it splits into n-grams. These are a set of co-occurring words within
+a given window. When computing them, you typically move one word forward. N-grams are very useful
+in developing language models and we have made them useful here as here to determine which multiple
+choice is the closest matching to the answer.</p>
+<img alt="_images/answer_grams.png" src="_images/answer_grams.png" />
+<p>Then for each answer, the bot creates a score based on how many grams appear in the processed answer:</p>
+<img alt="_images/score_dict.png" src="_images/score_dict.png" />
+<p>We construct a dictionary of unigrams, bigrams and the full string choice. The process then looks
+for each subgram in the gram dictionary within the answer. The more subgrams that are found in the answer,
+the more points are awarded. If the full string is found in the answer, the process awards the choice
+the maximum number of points.</p>
+<p>A check is then executed to evaluate if there are duplicate answers in the score dictionary,
+if no duplicate answers are present, an answer is obtained with the highest score:</p>
+<img alt="_images/correct_answer.png" src="_images/correct_answer.png" />
+</div>
+<div class="section" id="step-5">
+<h3>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h3>
+<p>In every step executed by the bot, it logs the information into a text file to be consulted later.
+Once the bot has completed, the text file log is then available to view as a means of seeing
+which questions were identified, which choices were identified and how the bot proceeded to answer them:</p>
+<img alt="_images/log.png" src="_images/log.png" />
+<p>Note that you do have to provide a <strong>filepath</strong> for the log file to be created.</p>
+<p>We will now explain three unique cases which are alternate paths of execution, there are more cases
+that are handled than these, so please feel free to consult the code base if you are interested
+and want to dive deeper.</p>
+</div>
+</div>
+<div class="section" id="case-duplicate-answers">
+<h2>Case - Duplicate Answers<a class="headerlink" href="#case-duplicate-answers" title="Permalink to this headline">¶</a></h2>
+<p>We will now consider the first unique case; this is when the bot executes the process outlined above
+as usual but encounters duplicate answers with the same scores:</p>
+<img alt="_images/score_dict_duplicate.png" src="_images/score_dict_duplicate.png" />
+<p>The function <em>obtain_correct_answer</em> in the class <strong>CorrectAnswer</strong> takes this into account by using
+the Regex library and employing the function <em>findall</em>. It then uses a similar logic of the n-grams process
+and awards scores to each duplicate answer based on how many times they appear in the correct answer
+obtained from a Google search.</p>
+<p>For more information on the Regex library, please see the relevant documentation (<a class="reference external" href="https://docs.python.org/3/library/re.html">https://docs.python.org/3/library/re.html</a>).</p>
+</div>
+<div class="section" id="case-image-answers">
+<h2>Case - Image Answers<a class="headerlink" href="#case-image-answers" title="Permalink to this headline">¶</a></h2>
+<p>We will now touch upon the case about what the bot does when it encounters answers that are
+images. These are quite common in the Driving Theory test as a common question would be
+'Which sign means...?':</p>
+<img alt="_images/image_choices.png" src="_images/image_choices.png" />
+<p>As discussed above, when the bot is presented with a new page, it identifies the question and the
+answer choices. The method of creating a choices dictionary only works if the choices presented
+contain text. A process in place then evaluates whether or not this dictionary is empty; if it is
+then this means that the choices are images, not text:</p>
+<img alt="_images/choices_dict_empty.png" src="_images/choices_dict_empty.png" />
+<p>An evaluation process then takes place and outputs a bool. If <strong>True</strong>, then the choices dictionary is
+indeed empty and an alternate process is executed:</p>
+<img alt="_images/choices_dict_eval.png" src="_images/choices_dict_eval.png" />
+<p>This alternate process makes another dictionary with captions to each image, it uses the
+Highway Code Image Bank created at the beginning of the process:</p>
+<img alt="_images/captions_dict.png" src="_images/captions_dict.png" />
+<p>In the event that it cannot find a caption to the image, a fallback caption will be returned: <em>'No caption found'</em></p>
+<p>The process then analyses the question and returns the caption that is the closest matching answer:</p>
+<img alt="_images/correct_answer_image_question.png" src="_images/correct_answer_image_question.png" />
+<p>It then executes the rest of the process by analysing the n-grams and matching to the original question.</p>
+</div>
+<div class="section" id="case-image-question">
+<h2>Case - Image Question<a class="headerlink" href="#case-image-question" title="Permalink to this headline">¶</a></h2>
+<p>The final case we will touch upon is also another common one; what does the bot do in the event that
+it encounters an image question with text answers:</p>
+<img alt="_images/image_question.png" src="_images/image_question.png" />
+<p>In this instance, the alternate process is similar to the case of Image Answers. However in this case,
+the choices dictionary that will be created will not be empty as the answer choices themselves are
+texts, not images:</p>
+<img alt="_images/choices_dict1.png" src="_images/choices_dict1.png" />
+<p>The process then looks through the Highway Code Image Bank to see if it can obtain a caption, in the event
+that it cannot, it will obtain a new tab on Google and perform an image search instead:</p>
+<img alt="_images/google_search_image.png" src="_images/google_search_image.png" />
+<img alt="_images/image_question_answer.png" src="_images/image_question_answer.png" />
+<p>Once an answer has been obtained, the rest of the process is then executed to obtain a correct answer.</p>
+<p>For a more detailed picture of the answering pipeline, please see this link:</p>
+<p><a class="reference external" href="https://raw.githubusercontent.com/anisengupta/driving_theory/main/images/flowchart/driving_theory_flowchart_v2.png">https://raw.githubusercontent.com/anisengupta/driving_theory/main/images/flowchart/driving_theory_flowchart_v2.png</a></p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="code.html" class="btn btn-neutral float-right" title="Code Documentation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Driving Theory Documentation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Aniruddha Sengupta.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> and ❤️  using a custom <a href="https://github.com/LinxiFan/Stanford-theme">theme</a> based on <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
