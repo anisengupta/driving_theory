@@ -92,9 +92,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#the-process-guide">The Process Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#step-1">Step 1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#step-2">Step 2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Step 2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#step-3">Step 3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#step-4">Step 4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5">Step 5</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#case-duplicate-answers">Case - Duplicate Answers</a></li>
@@ -197,7 +197,7 @@ required in order for the bot to function.</p>
 <h2>The Process Guide<a class="headerlink" href="#the-process-guide" title="Permalink to this headline">¶</a></h2>
 <p>We will now describe the general process undertaken. This is the simplest case, where the bot opens
 the correct webpage, identifies the question, determines that there are no pictorial questions or answers
-and executes the steps to answer that question.</p>
+and executes the steps to answer to that question.</p>
 <div class="section" id="step-1">
 <h3>Step 1<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h3>
 <p>The first step to consider is to start the test and navigate our way to the page.
@@ -213,15 +213,15 @@ which we will make use of later once we encounter pictorial questions:</p>
 <p>The second step, once the test has been started, is to identify the question:</p>
 <img alt="_images/identify_question.png" src="_images/identify_question.png" />
 </div>
-<div class="section" id="id1">
-<h3>Step 2<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="step-3">
+<h3>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h3>
 <p>The bot then identifies the choices it is presented to the question and stores
 the answers in a dictionary along with its respective ids:</p>
 <img alt="_images/identify_choices.png" src="_images/identify_choices.png" />
 <img alt="_images/choices_dict.png" src="_images/choices_dict.png" />
 </div>
-<div class="section" id="step-3">
-<h3>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="step-4">
+<h3>Step 4<a class="headerlink" href="#step-4" title="Permalink to this headline">¶</a></h3>
 <p>The bot then performs as a human would if they do not know the answer to the question; it Googles it:</p>
 <img alt="_images/google_answer.png" src="_images/google_answer.png" />
 <img alt="_images/answer.png" src="_images/answer.png" />
@@ -244,8 +244,8 @@ the maximum number of points.</p>
 if no duplicate answers are present, an answer is obtained with the highest score:</p>
 <img alt="_images/correct_answer.png" src="_images/correct_answer.png" />
 </div>
-<div class="section" id="step-4">
-<h3>Step 4<a class="headerlink" href="#step-4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="step-5">
+<h3>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h3>
 <p>In every step executed by the bot, it logs the information into a text file to be consulted later.
 Once the bot has completed, the text file log is then available to view as a means of seeing
 which questions were identified, which choices were identified and how the bot proceeded to answer them:</p>
@@ -303,6 +303,8 @@ that it cannot, it will obtain a new tab on Google and perform an image search i
 <img alt="_images/google_search_image.png" src="_images/google_search_image.png" />
 <img alt="_images/image_question_answer.png" src="_images/image_question_answer.png" />
 <p>Once an answer has been obtained, the rest of the process is then executed to obtain a correct answer.</p>
+<p>For a more detailed picture of the answering pipeline, please see this link:</p>
+<p><a class="reference external" href="https://raw.githubusercontent.com/anisengupta/driving_theory/main/images/flowchart/driving_theory_flowchart_v2.png">https://raw.githubusercontent.com/anisengupta/driving_theory/main/images/flowchart/driving_theory_flowchart_v2.png</a></p>
 </div>
 </div>
 
