@@ -24,9 +24,7 @@ author = 'Aniruddha Sengupta'
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
 
-import stanford_theme
-html_theme = 'stanford_theme'
-html_theme_path = [stanford_theme.get_html_theme_path()]
+html_theme = 'pyramid'
 
 # -- General configuration ---------------------------------------------------
 
@@ -37,8 +35,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    "stanford_theme"]
+    'sphinx.ext.napoleon']
 
 
 # Add any paths that contain templates here, relative to this directory.

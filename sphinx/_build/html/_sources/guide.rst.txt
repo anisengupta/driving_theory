@@ -145,7 +145,7 @@ Highway Code Image Bank created at the beginning of the process:
 
 .. image:: ../images/image_answers/captions_dict.png
 
-In the event that it cannot find a caption to the image, a fallback caption will be returned: *'No caption found'*
+In the event that it cannot find a caption to the image, a fallback caption will be returned: *'No caption found'*.
 
 The process then analyses the question and returns the caption that is the closest matching answer:
 
